@@ -37,6 +37,8 @@ class Settings(BaseSettings):
     DEMO_MODE: bool = False
     # Demo logins per client IP per hour.
     DEMO_RATE_PER_HOUR: int = 20
+    # Запросов к ИИ на одного пользователя в демо-режиме за всё время жизни аккаунта (0 = без лимита).
+    DEMO_AI_PER_USER: int = 2
 
     UPLOAD_DIR: str = "./uploads"
     MAX_UPLOAD_MB: int = 10

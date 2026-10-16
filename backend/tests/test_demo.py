@@ -34,6 +34,7 @@ def demo_on(settings, monkeypatch):
     monkeypatch.setattr(settings, "DEMO_MODE", True)
     monkeypatch.setattr(settings, "DEMO_RATE_PER_HOUR", 20)
     monkeypatch.setattr(settings, "AI_DAILY_LIMIT", 0)
+    monkeypatch.setattr(settings, "DEMO_AI_PER_USER", 0)
     monkeypatch.setattr(settings, "ADMIN_EMAILS", "")
     return settings
 
@@ -249,3 +250,35 @@ def test_daily_cap_counts_all_users(client, db, tutor_ctx, demo_on, monkeypatch,
     assert _tutor(client, tutor_ctx).status_code == 429
     assert len(tutor_ctx["calls"]) == 1
     assert db.scalar(select(func.count(AiMessage.id))) == 2
+
+
+def test_user_gets_only_two_ai_requests_in_demo(client, db, tutor_ctx, demo_on, monkeypatch):
+    monkeypatch.setattr(demo_on, "DEMO_AI_PER_USER", 2)
+
+    assert _tutor(client, tutor_ctx).status_code == 200
+    assert _tutor(client, tutor_ctx).status_code == 200
+    third = _tutor(client, tutor_ctx)
+
+    assert third.status_code == 429
+    assert "2 запроса" in third.json()["detail"]
+    assert len(tutor_ctx["calls"]) == 2
+
+
+def test_user_cap_is_per_account(client, db, tutor_ctx, demo_on, monkeypatch, make_user):
+    monkeypatch.setattr(demo_on, "DEMO_AI_PER_USER", 1)
+    _, other_headers = make_user("admin")
+
+    assert _tutor(client, tutor_ctx).status_code == 200
+    assert _tutor(client, tutor_ctx).status_code == 429
+    other = client.post(
+        TUTOR_URL, json={"lesson_id": tutor_ctx["lesson_id"], "mode": "example"}, headers=other_headers
+    )
+    assert other.status_code == 200
+
+
+def test_user_cap_does_not_apply_outside_demo_mode(client, db, tutor_ctx, settings, monkeypatch):
+    monkeypatch.setattr(settings, "DEMO_MODE", False)
+    monkeypatch.setattr(settings, "DEMO_AI_PER_USER", 1)
+
+    assert _tutor(client, tutor_ctx).status_code == 200
+    assert _tutor(client, tutor_ctx).status_code == 200

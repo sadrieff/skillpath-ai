@@ -92,3 +92,17 @@ def enforce_daily_ai_cap(db: Session) -> None:
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="Дневной лимит ИИ-наставника на демо-стенде исчерпан, попробуйте завтра",
         )
+
+
+def enforce_demo_user_cap(db: Session, user_id: int) -> None:
+    """В демо-режиме у каждого аккаунта всего DEMO_AI_PER_USER запросов к ИИ. Считаются и отказы модели."""
+    settings = get_settings()
+    limit = settings.DEMO_AI_PER_USER
+    if not settings.DEMO_MODE or limit <= 0:
+        return
+    used = db.scalar(select(func.count(AiMessage.id)).where(AiMessage.user_id == user_id))
+    if (used or 0) >= limit:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"На демо-стенде доступно {limit} запроса к ИИ-наставнику на одного посетителя",
+        )

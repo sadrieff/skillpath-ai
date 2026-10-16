@@ -5,6 +5,8 @@ import ErrorBox from "@/components/ErrorBox";
 import Spinner from "@/components/Spinner";
 import { ApiError, askTutor, errorMessage, getAiHistory } from "@/lib/api";
 import type { AiMessage, TutorMode } from "@/lib/types";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 /** A request from the quiz to explain the mistakes of one attempt. `nonce` makes repeated clicks distinct. */
 export interface MistakeRequest {
@@ -200,7 +202,7 @@ export default function AiTutor({ lessonId, mistakeRequest }: AiTutorProps) {
             className={`flex ${item.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[90%] whitespace-pre-wrap rounded px-3.5 py-2.5 text-sm leading-relaxed ${
+              className={`max-w-[90%] rounded px-3.5 py-2.5 text-sm leading-relaxed ${item.role === "user" ? "whitespace-pre-wrap" : ""} ${
                 item.role === "user"
                   ? "bg-accent/25 text-ink"
                   : item.failed
@@ -209,7 +211,13 @@ export default function AiTutor({ lessonId, mistakeRequest }: AiTutorProps) {
               } ${item.clamp ? "line-clamp-3" : ""}`}
             >
               <span className="sr-only">{item.role === "user" ? "Вы: " : "Наставник: "}</span>
-              {item.text}
+              {item.role === "assistant" && !item.failed ? (
+                <div className="prose-sp !text-sm">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.text}</ReactMarkdown>
+                </div>
+              ) : (
+                item.text
+              )}
             </div>
           </div>
         ))}

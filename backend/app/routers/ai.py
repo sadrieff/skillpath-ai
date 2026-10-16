@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.demo import enforce_daily_ai_cap
+from app.demo import enforce_daily_ai_cap, enforce_demo_user_cap
 from app.deps import CurrentUser, DbSession
 from app.models import AiMessage, Enrollment, Lesson, Profile, Quiz, QuizAttempt, utcnow
 from app.schemas import AiHistoryItem, TutorIn, TutorOut
@@ -104,6 +104,7 @@ async def tutor(payload: TutorIn, user: CurrentUser, db: DbSession) -> TutorOut:
         mistakes = _mistakes_for_attempt(db, user, lesson, payload.attempt_id)
 
     _enforce_rate_limit(db, user)
+    enforce_demo_user_cap(db, user.id)
     enforce_daily_ai_cap(db)
 
     lesson_title = lesson.title
@@ -124,7 +125,18 @@ async def tutor(payload: TutorIn, user: CurrentUser, db: DbSession) -> TutorOut:
         raise HTTPException(status_code=502, detail="AI tutor is temporarily unavailable") from None
 
     if ai_guard.is_off_topic_answer(answer) or ai_guard.is_blocked(answer):
-        # The model refused or the answer drifted into a blocked topic: never show it to the student.
+        # Модель отказалась или ушла в запрещённую тему: студенту это не показываем. Запрос уже стоил
+        # денег, поэтому он сохраняется с отказом вместо ответа и учитывается во всех лимитах.
+        db.add(
+            AiMessage(
+                user_id=user.id,
+                lesson_id=lesson.id,
+                mode=payload.mode,
+                prompt=message or payload.mode,
+                answer=ai_guard.REFUSAL,
+            )
+        )
+        db.commit()
         raise HTTPException(status_code=422, detail=ai_guard.REFUSAL)
 
     row = AiMessage(

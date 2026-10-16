@@ -16,48 +16,48 @@ export interface QuizQuestion {
 
 export const QUIZ: QuizQuestion[] = [
   {
-    id: "slice",
-    prompt: "Что выведет print(len([1, 2, 3][1:]))?",
+    id: "float-type",
+    prompt: "Какой тип у значения 3.14 в Python?",
     options: [
       {
-        text: "1",
+        text: "int",
         feedback:
-          "Срез не оставляет один элемент. [1:] берёт всё, начиная с индекса 1, это 2 и 3.",
+          "int хранит только целые числа. У 3.14 есть дробная часть, поэтому это float.",
       },
       {
-        text: "2",
+        text: "float",
         feedback: "",
       },
       {
-        text: "3",
+        text: "str",
         feedback:
-          "Срез [1:] пропускает первый элемент, с индексом 0. Остаются 2 и 3, то есть два элемента.",
+          "Строка записывается в кавычках: \"3.14\". Без кавычек это число с дробной частью, то есть float.",
       },
     ],
     correct: 1,
-    correctFeedback: "Верно. Срез [1:] берёт элементы с индекса 1: это 2 и 3.",
+    correctFeedback: "Верно. Числа с дробной частью в Python имеют тип float.",
   },
   {
-    id: "list-multiply",
-    prompt: "Что будет в x после кода x = [0] * 3 и x[0] = 5?",
+    id: "string-plus",
+    prompt: "Что выведет print(\"42\" + \"1\")?",
     options: [
       {
-        text: "[5, 5, 5]",
+        text: "43",
         feedback:
-          "Присваивание x[0] = 5 меняет только элемент с индексом 0. Остальные два остаются нулями.",
+          "Кавычки делают значения строками. Знак + склеивает строки, а не складывает числа, поэтому получится 421.",
       },
       {
-        text: "[5, 0, 0]",
+        text: "421",
         feedback: "",
       },
       {
-        text: "[0, 0, 5]",
+        text: "Ошибка",
         feedback:
-          "Индексация начинается с нуля. x[0] это первый элемент, поэтому меняется именно он.",
+          "Ошибки не будет: две строки можно складывать, они склеиваются. Результат: 421.",
       },
     ],
     correct: 1,
-    correctFeedback: "Верно. [0] * 3 даёт три нуля, и присваивание меняет только первый.",
+    correctFeedback: "Верно. Знак + склеивает строки: \"42\" и \"1\" дают \"421\".",
   },
 ];
 
@@ -196,32 +196,5 @@ export const FAQ: { q: string; a: string }[] = [
   {
     q: "Какие данные вы храните?",
     a: "Из Google берём email, имя и аватар. Ещё храним записи на курсы, прогресс, результаты тестов и диалоги с наставником. Пароли не храним. Текст урока и ваши ответы уходят в RouterAI, ключ к нему лежит только на сервере.",
-  },
-];
-
-export const PHOTO_CREDITS: { label: string; by: string; licence: string; url: string }[] = [
-  {
-    label: "Классная доска, 1923",
-    by: "FOTO:Fortepan, Wikimedia Commons",
-    licence: "public domain",
-    url: "https://commons.wikimedia.org/wiki/File:Education,_school,_classroom,_blackboard,_teacher_Fortepan_3612.jpg",
-  },
-  {
-    label: "Класс, Вашингтон, 1899",
-    by: "Frances Benjamin Johnston, Library of Congress, Wikimedia Commons",
-    licence: "public domain",
-    url: "https://commons.wikimedia.org/wiki/File:Classroom_scene_in_Washington,_D.C._elementary_school_-_children_working_with_blocks_and_at_blackboard_in_mathematics_class_LCCN2001703711.jpg",
-  },
-  {
-    label: "Публичная библиотека, Сидней, c. 1885",
-    by: "State Library of New South Wales, Wikimedia Commons",
-    licence: "public domain",
-    url: "https://commons.wikimedia.org/wiki/File:Staff_inside_the_Free_Public_Library_(old_State_Library_of_New_South_Wales),_c._1885_-_Flickr_-_State_Library_of_NSW.jpg",
-  },
-  {
-    label: "Школьная комната, Кармсунд, c. 1910",
-    by: "Wolfmann, Wikimedia Commons, CC BY-SA 4.0",
-    licence: "CC BY-SA 4.0",
-    url: "https://commons.wikimedia.org/wiki/File:Karmsund_folkemuseum_Haugesund_Norway_Interior_Skolestue_klasserom_Class_room_ca_1910_Skolepulter_skrivepulter_benker_school_room_benches_writing_desks_Kateter_Tavle_Blackboard_etc_2020-06-10_DSC00312.jpg",
   },
 ];

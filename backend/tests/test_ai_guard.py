@@ -71,7 +71,9 @@ def test_offtopic_marker_from_model_is_replaced(client, db, configured, monkeypa
     r = _ask(client, lesson_ctx, "Какая сегодня погода в Казани?")
     assert r.status_code == 422
     assert r.json()["detail"] == REFUSAL
-    assert _saved(db) == 0
+    # Запрос стоил денег, поэтому он учтён в лимитах, но вместо ответа модели хранится отказ.
+    assert _saved(db) == 1
+    assert db.scalar(select(AiMessage.answer)) == REFUSAL
 
 
 def test_answer_with_blocked_topic_is_not_shown(client, db, configured, monkeypatch, lesson_ctx):  # noqa: F811
@@ -82,7 +84,8 @@ def test_answer_with_blocked_topic_is_not_shown(client, db, configured, monkeypa
     r = _ask(client, lesson_ctx, "Объясни переменные")
     assert r.status_code == 422
     assert "боеголов" not in r.text
-    assert _saved(db) == 0
+    assert _saved(db) == 1
+    assert db.scalar(select(AiMessage.answer)) == REFUSAL
 
 
 def test_normal_question_still_works(client, db, configured, fake_chat, lesson_ctx):  # noqa: F811

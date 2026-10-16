@@ -3,7 +3,17 @@
 import { useId, useState } from "react";
 import { QUIZ, type QuizQuestion } from "./data";
 
-function QuestionBlock({ question, index }: { question: QuizQuestion; index: number }) {
+function QuestionBlock({
+  question,
+  index,
+  isLast,
+  onNext,
+}: {
+  question: QuizQuestion;
+  index: number;
+  isLast: boolean;
+  onNext: () => void;
+}) {
   const [picked, setPicked] = useState<number | null>(null);
   const [checked, setChecked] = useState(false);
   const groupId = useId();
@@ -48,6 +58,11 @@ function QuestionBlock({ question, index }: { question: QuizQuestion; index: num
         >
           Проверить
         </button>
+        {checked && (
+          <button type="button" className="lp-btn lp-btn-primary" onClick={onNext}>
+            {isLast ? "Пройти заново" : "Следующий вопрос"}
+          </button>
+        )}
       </div>
       {/* Reserved height keeps the layout still when feedback appears. */}
       <div className="lp-quiz-feedback" aria-live="polite">
@@ -70,12 +85,21 @@ function QuestionBlock({ question, index }: { question: QuizQuestion; index: num
 }
 
 export default function MiniQuiz() {
+  const [index, setIndex] = useState(0);
+  const question = QUIZ[index];
+
   return (
     <div className="lp-quiz" data-ui>
-      <p className="lp-quiz-title">Два вопроса по Python. Ответьте и проверьте.</p>
-      {QUIZ.map((q, i) => (
-        <QuestionBlock key={q.id} question={q} index={i} />
-      ))}
+      <p className="lp-quiz-title">
+        Вопрос {index + 1} из {QUIZ.length}. Выберите неверный ответ, чтобы увидеть разбор.
+      </p>
+      <QuestionBlock
+        key={question.id}
+        question={question}
+        index={index}
+        isLast={index === QUIZ.length - 1}
+        onNext={() => setIndex((index + 1) % QUIZ.length)}
+      />
     </div>
   );
 }
