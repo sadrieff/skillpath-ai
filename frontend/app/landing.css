@@ -195,6 +195,29 @@
   background: var(--surface);
 }
 
+/* Demo stand: Google button and the two demo buttons in one row */
+
+.lp-action-group {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+}
+
+.lp-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.lp-action-foot {
+  display: grid;
+  gap: 8px;
+  max-width: 44ch;
+}
+
+.lp-action-note { margin: 0; font-size: var(--step-small); color: var(--muted); }
+
 .lp-demo-title { margin: 0; font-weight: 700; }
 .lp-error { margin: 0; color: var(--danger); font-size: var(--step-small); }
 

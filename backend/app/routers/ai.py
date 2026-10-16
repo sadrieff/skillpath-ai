@@ -6,6 +6,7 @@ from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.demo import enforce_daily_ai_cap
 from app.deps import CurrentUser, DbSession
 from app.models import AiMessage, Enrollment, Lesson, Profile, Quiz, QuizAttempt, utcnow
 from app.schemas import AiHistoryItem, TutorIn, TutorOut
@@ -103,6 +104,7 @@ async def tutor(payload: TutorIn, user: CurrentUser, db: DbSession) -> TutorOut:
         mistakes = _mistakes_for_attempt(db, user, lesson, payload.attempt_id)
 
     _enforce_rate_limit(db, user)
+    enforce_daily_ai_cap(db)
 
     lesson_title = lesson.title
     lesson_content = lesson.content or ""

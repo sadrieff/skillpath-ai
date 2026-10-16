@@ -22,6 +22,7 @@ pnpm-debug.log*
 .env
 .env.*
 !.env.example
+deploy/demo.env
 uploads/
 *.db
 *.sqlite3
@@ -34,3 +35,4 @@ Thumbs.db
 
 # design inspector output
 .taste-skill/
+deploy/certs/

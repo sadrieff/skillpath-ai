@@ -1,0 +1,24 @@
+# Caddy for the demo stand. DEMO_HOST comes from deploy/demo.env (a domain, or <ip-with-dashes>.sslip.io).
+# HTTPS certificates are issued automatically (ports 80 and 443 must be open).
+# Caddy sets X-Forwarded-For and X-Forwarded-Proto on proxied requests itself.
+
+{$DEMO_HOST} {
+	encode gzip
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		X-Frame-Options DENY
+	}
+
+	# Backend: REST API, uploaded files, health check, Swagger UI and OpenAPI schema.
+	@api path /api/* /uploads/* /health /docs /docs/* /openapi.json
+	handle @api {
+		reverse_proxy api:8000
+	}
+
+	# Everything else: Next.js frontend.
+	handle {
+		reverse_proxy web:3000
+	}
+}

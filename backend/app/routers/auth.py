@@ -12,9 +12,10 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
+from app.demo import client_ip, create_demo_student, enforce_demo_rate_limit, get_or_create_demo_admin
 from app.deps import CurrentUser, DbSession
 from app.models import Profile
-from app.schemas import DevLoginIn, TokenOut, UserOut
+from app.schemas import DemoLoginIn, DevLoginIn, TokenOut, UserOut
 from app.security import create_access_token
 
 GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
@@ -109,6 +110,11 @@ def _require_dev_login() -> None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
 
 
+def _require_demo_mode() -> None:
+    if not get_settings().DEMO_MODE:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+
+
 @router.get("/google/login")
 async def google_login(request: Request) -> RedirectResponse:
     settings = get_settings()
@@ -169,6 +175,18 @@ def dev_login(body: DevLoginIn, db: DbSession) -> TokenOut:
     _apply_admin_role(profile, body.email, settings)
     db.commit()
     db.refresh(profile)
+    return _token_response(profile)
+
+
+@router.post("/demo-login", response_model=TokenOut, dependencies=[Depends(_require_demo_mode)])
+def demo_login(body: DemoLoginIn, request: Request, db: DbSession) -> TokenOut:
+    """Login for the public test stand. Ignores ADMIN_EMAILS and never goes through dev-login."""
+    settings = get_settings()
+    enforce_demo_rate_limit(client_ip(request), settings.DEMO_RATE_PER_HOUR)
+    if body.role == "student":
+        profile = create_demo_student(db)
+    else:
+        profile = get_or_create_demo_admin(db)
     return _token_response(profile)
 
 

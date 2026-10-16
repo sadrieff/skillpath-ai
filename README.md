@@ -171,3 +171,7 @@ docs/         ai-log, design
 .github/      CI и деплой
 ARCHITECTURE.md   контракт API и страниц
 ```
+
+## Демо-стенд
+
+Как поднять публичный демо-стенд на VPS с HTTPS: см. [docs/deploy-demo.md](docs/deploy-demo.md).

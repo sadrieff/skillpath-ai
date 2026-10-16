@@ -26,6 +26,10 @@ class TokenOut(BaseModel):
     user: UserOut
 
 
+class DemoLoginIn(BaseModel):
+    role: Literal["student", "admin"]
+
+
 class DevLoginIn(BaseModel):
     email: str = Field(min_length=3, max_length=255)
     full_name: str | None = Field(default=None, max_length=255)

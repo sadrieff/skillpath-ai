@@ -181,6 +181,14 @@ export const devLogin = (email: string, full_name?: string) =>
     auth: false,
   });
 
+/** Demo stand only: signs in as the seeded demo student or admin. */
+export const demoLogin = (role: "student" | "admin") =>
+  request<DevLoginResponse>("/api/auth/demo-login", {
+    method: "POST",
+    body: { role },
+    auth: false,
+  });
+
 // ---------- Catalog ----------
 
 export interface CourseListParams {

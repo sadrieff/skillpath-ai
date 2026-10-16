@@ -3,14 +3,22 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
-import { devLogin, errorMessage } from "@/lib/api";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type FormEvent,
+  type ReactNode,
+} from "react";
+import { demoLogin, devLogin, errorMessage } from "@/lib/api";
 import { googleLoginUrl, useAuth } from "@/lib/auth";
 import CatalogTyping from "./CatalogTyping";
 import { CAPABILITIES, FAQ, PHOTO_CREDITS } from "./data";
 import MiniQuiz from "./MiniQuiz";
 
 const DEV_LOGIN_ENABLED = process.env.NEXT_PUBLIC_ENABLE_DEV_LOGIN === "1";
+const DEMO_ENABLED = process.env.NEXT_PUBLIC_DEMO === "1";
 
 /** Sets the --i custom property used by the staggered entrances in landing.css. */
 function vi(i: number): CSSProperties {
@@ -30,6 +38,65 @@ function PrimaryAction({ logged }: { logged: boolean }) {
       Войти через Google
     </a>
   );
+}
+
+/**
+ * Google button plus the two demo buttons (demo stand only).
+ * Each instance keeps its own busy state and error text.
+ */
+function ActionGroup({ primary }: { primary: ReactNode }) {
+  const { loginWithToken } = useAuth();
+  const router = useRouter();
+  const [busy, setBusy] = useState<"student" | "admin" | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function onDemo(role: "student" | "admin") {
+    setBusy(role);
+    setError(null);
+    try {
+      const res = await demoLogin(role);
+      await loginWithToken(res.access_token);
+      router.replace("/dashboard");
+    } catch (err) {
+      setError(errorMessage(err));
+      setBusy(null);
+    }
+  }
+
+  return (
+    <div className="lp-action-group">
+      <div className="lp-action-row">
+        {primary}
+        <button
+          type="button"
+          className="lp-btn lp-btn-quiet"
+          disabled={busy !== null}
+          onClick={() => void onDemo("student")}
+        >
+          {busy === "student" ? "Входим…" : "Войти как студент"}
+        </button>
+        <button
+          type="button"
+          className="lp-btn lp-btn-quiet"
+          disabled={busy !== null}
+          onClick={() => void onDemo("admin")}
+        >
+          {busy === "admin" ? "Входим…" : "Войти как админ"}
+        </button>
+      </div>
+      <div className="lp-action-foot">
+        {error && <p className="lp-error">{error}</p>}
+        <p className="lp-action-note">
+          Демо: данные сбрасываются каждую ночь, ИИ-наставник ограничен по числу запросов в день.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/** Wraps the primary action with the demo buttons only when the demo stand flag is set. */
+function withDemo(primary: ReactNode) {
+  return DEMO_ENABLED ? <ActionGroup primary={primary} /> : primary;
 }
 
 function DemoLogin() {
@@ -164,7 +231,7 @@ export default function Landing() {
               {DEV_LOGIN_ENABLED && <DemoLogin />}
             </div>
             <div className="lp-hero-action" data-rise style={vi(3)}>
-              <PrimaryAction logged={logged} />
+              {withDemo(<PrimaryAction logged={logged} />)}
             </div>
           </div>
 
@@ -295,9 +362,7 @@ export default function Landing() {
               <p className="lp-lead" data-reveal>
                 Войдите через Google и откройте курс «Python для начинающих».
               </p>
-              <div data-reveal>
-                <PrimaryAction logged={logged} />
-              </div>
+              <div data-reveal>{withDemo(<PrimaryAction logged={logged} />)}</div>
             </div>
           </section>
 

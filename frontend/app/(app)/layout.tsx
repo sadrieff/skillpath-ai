@@ -11,6 +11,11 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       >
         Перейти к содержанию
       </a>
+      {process.env.NEXT_PUBLIC_DEMO === "1" && (
+        <div className="bg-surface-2 px-4 py-2 text-center text-sm text-muted sm:px-6">
+          Демо-стенд. Данные можно менять, ночью они сбрасываются.
+        </div>
+      )}
       <Navbar />
       <main id="main" className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
         {children}

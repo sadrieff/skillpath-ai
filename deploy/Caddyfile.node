@@ -1,0 +1,25 @@
+# Caddy стенда на порту 8443. Сертификат выпущен отдельно (DNS-проверка), поэтому автоматический
+# HTTPS выключен: 80 и 443 на ноде заняты, и Caddy не должен пытаться их занять.
+{
+	auto_https off
+}
+
+{$DEMO_HOST}:8443 {
+	tls /certs/fullchain.pem /certs/privkey.pem
+	encode gzip
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		X-Frame-Options DENY
+	}
+
+	@api path /api/* /uploads/* /health /docs /docs/* /openapi.json
+	handle @api {
+		reverse_proxy api:8000
+	}
+
+	handle {
+		reverse_proxy web:3000
+	}
+}

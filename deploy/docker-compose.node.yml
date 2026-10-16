@@ -1,0 +1,77 @@
+# Демо-стенд на общей ноде: образы собирает GitHub Actions (.github/workflows/demo-images.yml),
+# нода их только скачивает и запускает. Свой Caddy на порту 8443 со своим сертификатом,
+# чужие Caddy и Xray на ноде не затрагиваются. Контейнерам выставлены лимиты памяти и процессора.
+#
+#   docker compose -f deploy/docker-compose.node.yml --env-file deploy/demo.env pull
+#   docker compose -f deploy/docker-compose.node.yml --env-file deploy/demo.env up -d
+
+name: skillpath-demo
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    mem_limit: 256m
+    cpus: 0.5
+    environment:
+      POSTGRES_USER: skillpath
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in deploy/demo.env}
+      POSTGRES_DB: skillpath
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U skillpath -d skillpath"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  api:
+    image: ghcr.io/sadrieff/skillpath-api:latest
+    restart: unless-stopped
+    mem_limit: 384m
+    cpus: 0.75
+    env_file:
+      - ./demo.env
+    environment:
+      DATABASE_URL: postgresql+psycopg://skillpath:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in deploy/demo.env}@db:5432/skillpath
+      UPLOAD_DIR: /app/uploads
+    volumes:
+      - uploads:/app/uploads
+    # Caddy ставит X-Forwarded-For, api доступен только из сети compose.
+    command:
+      - sh
+      - -c
+      - alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips=*
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    image: ghcr.io/sadrieff/skillpath-web:latest
+    restart: unless-stopped
+    mem_limit: 256m
+    cpus: 0.5
+    depends_on:
+      - api
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    mem_limit: 64m
+    cpus: 0.25
+    ports:
+      - "8443:8443"
+    environment:
+      DEMO_HOST: ${DEMO_HOST:?set DEMO_HOST in deploy/demo.env}
+    volumes:
+      - ./Caddyfile.node:/etc/caddy/Caddyfile:ro
+      # fullchain.pem и privkey.pem лежат на ноде в deploy/certs (в .gitignore)
+      - ./certs:/certs:ro
+    depends_on:
+      - api
+      - web
+
+volumes:
+  pgdata:
+  uploads:

@@ -1,0 +1,86 @@
+# Demo stand: one VPS, Caddy in front (HTTPS automatic), api and web on the internal network.
+# Only Caddy publishes ports (80, 443). Everything else is reachable only inside the compose network.
+#
+# Usage (from the repo root, see deploy/setup-server.sh):
+#   docker compose -f deploy/docker-compose.demo.yml --env-file deploy/demo.env up -d --build
+#
+# Variables for ${...} substitution come from deploy/demo.env (--env-file).
+# Values inside env_file (demo.env, read by api) are taken literally, not substituted.
+
+name: skillpath-demo
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: skillpath
+      # Required: compose stops with an error if POSTGRES_PASSWORD is empty in demo.env.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in deploy/demo.env}
+      POSTGRES_DB: skillpath
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U skillpath -d skillpath"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    # Not published to the host.
+
+  api:
+    build:
+      context: ../backend
+    restart: unless-stopped
+    env_file:
+      - ./demo.env
+    environment:
+      # Overrides demo.env: inside the compose network the database host is `db`.
+      DATABASE_URL: postgresql+psycopg://skillpath:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in deploy/demo.env}@db:5432/skillpath
+      UPLOAD_DIR: /app/uploads
+    volumes:
+      - uploads:/app/uploads
+    # Same as the image CMD, plus: trust X-Forwarded-For from Caddy (the only peer that can reach
+    # this port, since api is not published). Without it, request.client is always the Caddy container.
+    command:
+      - sh
+      - -c
+      - alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips=*
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ../frontend
+      args:
+        # Public address of the stand. The browser calls the API on the same host through Caddy.
+        NEXT_PUBLIC_API_URL: https://${DEMO_HOST:?set DEMO_HOST in deploy/demo.env}
+        NEXT_PUBLIC_DEMO: "1"
+    restart: unless-stopped
+    depends_on:
+      - api
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      # Read by the Caddyfile as {$DEMO_HOST}.
+      DEMO_HOST: ${DEMO_HOST:?set DEMO_HOST in deploy/demo.env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # Certificates and ACME account. Losing this volume means new certificates on next start.
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+      - web
+
+volumes:
+  pgdata:
+  uploads:
+  caddy_data:
+  caddy_config:

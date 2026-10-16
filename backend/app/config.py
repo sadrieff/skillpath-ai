@@ -30,6 +30,13 @@ class Settings(BaseSettings):
     ROUTERAI_API_KEY: str = ""
     AI_BASE_URL: str = "https://routerai.ru/api/v1/chat/completions"
     AI_MODEL: str = "qwen/qwen3.5-flash-02-23"
+    # Total tutor calls per UTC day across all users. 0 turns the cap off.
+    AI_DAILY_LIMIT: int = 0
+
+    # Public test stand: enables POST /api/auth/demo-login and `python -m app.demo_reset`.
+    DEMO_MODE: bool = False
+    # Demo logins per client IP per hour.
+    DEMO_RATE_PER_HOUR: int = 20
 
     UPLOAD_DIR: str = "./uploads"
     MAX_UPLOAD_MB: int = 10
