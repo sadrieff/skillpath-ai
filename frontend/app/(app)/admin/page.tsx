@@ -38,7 +38,7 @@ function AdminContent() {
   if (!isAdmin) {
     return (
       <div className="card max-w-lg space-y-2">
-        <h1 className="text-[2.5rem] font-extrabold leading-tight text-ink">Нет доступа</h1>
+        <h1 className="text-[1.75rem] sm:text-[2.5rem] font-extrabold leading-tight text-ink">Нет доступа</h1>
         <p className="text-base text-muted">Раздел доступен только администраторам. Открываем дашборд.</p>
       </div>
     );
@@ -61,7 +61,7 @@ function AdminContent() {
 
   return (
     <div className="space-y-10">
-      <h1 className="text-[2.5rem] font-extrabold leading-tight text-ink">Администрирование</h1>
+      <h1 className="text-[1.75rem] sm:text-[2.5rem] font-extrabold leading-tight text-ink">Администрирование</h1>
 
       <div
         role="tablist"
