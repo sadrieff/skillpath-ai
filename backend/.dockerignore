@@ -1,0 +1,30 @@
+# VCS and editor files
+.git
+.gitignore
+.vscode
+.idea
+
+# Python caches and virtualenvs
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Local data (never bake into the image)
+.env
+.env.*
+!.env.example
+uploads/
+*.db
+*.sqlite3
+
+# Docker files themselves
+Dockerfile
+.dockerignore

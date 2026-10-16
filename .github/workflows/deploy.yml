@@ -1,0 +1,53 @@
+# OPTIONAL deployment workflow.
+#
+# Deploys the current main branch to a VPS over SSH:
+#   git pull && docker compose up -d --build
+#
+# Runs on manual trigger (workflow_dispatch) and automatically after a
+# successful push to main. Delete this file if you do not deploy from GitHub.
+#
+# Required repository secrets:
+#   VPS_HOST     - server address (IP or domain)
+#   VPS_USER     - SSH user with access to the project directory and docker
+#   VPS_SSH_KEY  - private SSH key for VPS_USER
+#
+# Assumes the project is already cloned on the VPS (path below) and that
+# the real .env file has been created there by hand. Secrets are not
+# stored in this repository.
+
+name: Deploy
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to VPS
+    # Automatic deploy only when CI succeeded; manual runs always proceed.
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -e
+            cd ~/skillpath-ai
+            git pull
+            docker compose up -d --build
+            docker image prune -f

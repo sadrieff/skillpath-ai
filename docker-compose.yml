@@ -1,0 +1,55 @@
+# SkillPath AI — local / single-VPS stack.
+# Usage: cp .env.example .env  (fill in secrets)  &&  docker compose up -d --build
+name: skillpath
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: skillpath
+      POSTGRES_PASSWORD: skillpath
+      POSTGRES_DB: skillpath
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U skillpath -d skillpath"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    # Not published to the host: only the api service talks to the database.
+
+  api:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # Overrides .env: inside the compose network the database host is `db`.
+      DATABASE_URL: postgresql+psycopg://skillpath:skillpath@db:5432/skillpath
+      UPLOAD_DIR: /app/uploads
+    volumes:
+      - uploads:/app/uploads
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+        NEXT_PUBLIC_ENABLE_DEV_LOGIN: ${NEXT_PUBLIC_ENABLE_DEV_LOGIN:-0}
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
+  uploads:

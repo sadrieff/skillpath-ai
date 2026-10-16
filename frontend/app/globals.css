@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Design tokens (docs/design/DESIGN.md). One source: tailwind.config.js reads these variables.
+ * Values are RGB channels so Tailwind opacity modifiers work (bg-accent/15).
+ * --c-line is not in DESIGN.md: a border colour between surface and surface-2.
+ */
+:root {
+  color-scheme: dark;
+  --c-ground: 11 16 32;        /* #0b1020 */
+  --c-surface: 18 25 54;       /* #121936 */
+  --c-surface-2: 26 35 71;     /* #1a2347 */
+  --c-line: 42 52 92;          /* #2a345c */
+  --c-ink: 242 245 255;        /* #f2f5ff */
+  --c-muted: 170 179 214;      /* #aab3d6 */
+  --c-accent: 200 241 105;     /* #c8f169 */
+  --c-accent-ink: 11 16 32;    /* #0b1020, text on accent */
+  --c-danger: 255 107 107;     /* #ff6b6b */
+  --c-success: 94 230 168;     /* #5ee6a8 */
+}
+
+body {
+  background-color: rgb(var(--c-ground));
+  color: rgb(var(--c-ink));
+}
+
+/* Focus ring for every interactive element. Mouse clicks on buttons do not show it. */
+:focus-visible {
+  outline: 3px solid rgb(var(--c-accent));
+  outline-offset: 2px;
+}
+
+body {
+  font-family: var(--font-onest), system-ui, sans-serif;
+  overflow-wrap: break-word;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+/* No double-tap zoom delay on controls. The tap highlight is replaced by the focus ring. */
+a,
+button,
+input,
+select,
+textarea,
+label,
+summary {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded bg-accent px-5 py-2.5 text-sm font-bold text-accent-ink transition-[background-color,transform] duration-150 hover:bg-accent/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-secondary {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded border border-line bg-surface-2 px-5 py-2.5 text-sm font-medium text-ink transition-[background-color,transform] duration-150 hover:bg-line active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .card {
+    @apply rounded border border-line bg-surface p-5;
+  }
+  .input {
+    @apply min-h-11 w-full rounded border border-line bg-ground px-4 py-2.5 text-sm text-ink placeholder:text-muted disabled:opacity-60;
+  }
+}
+
+/* Rendered markdown (lesson content). Used with react-markdown; no raw HTML is rendered. */
+.prose-sp {
+  @apply text-sm leading-relaxed text-ink sm:text-base;
+}
+.prose-sp > * + * {
+  margin-top: 1em;
+}
+.prose-sp h1 {
+  @apply mt-8 text-2xl font-bold text-ink;
+}
+.prose-sp h2 {
+  @apply mt-8 text-xl font-semibold text-ink;
+}
+.prose-sp h3 {
+  @apply mt-6 text-lg font-semibold text-ink;
+}
+.prose-sp h4 {
+  @apply mt-6 font-semibold text-ink;
+}
+.prose-sp strong {
+  @apply font-semibold text-ink;
+}
+.prose-sp a {
+  @apply text-accent underline underline-offset-2 hover:text-ink;
+}
+.prose-sp ul {
+  @apply list-disc space-y-1.5 pl-6;
+}
+.prose-sp ol {
+  @apply list-decimal space-y-1.5 pl-6;
+}
+.prose-sp blockquote {
+  @apply border-l-2 border-accent pl-4 italic text-muted;
+}
+.prose-sp code {
+  @apply rounded bg-surface-2 px-1.5 py-0.5 font-mono text-[0.9em] text-ink;
+}
+.prose-sp pre {
+  @apply overflow-x-auto rounded border border-line bg-ground p-4 font-mono text-sm;
+}
+.prose-sp pre code {
+  @apply bg-transparent p-0;
+}
+.prose-sp table {
+  @apply block w-full overflow-x-auto text-sm;
+}
+.prose-sp th,
+.prose-sp td {
+  @apply border border-line px-3 py-2 text-left;
+}
+.prose-sp th {
+  @apply bg-surface-2 font-semibold text-ink;
+}
+.prose-sp hr {
+  @apply border-line;
+}
+
+/* Reduced motion: transitions and one-shot animations finish at once. The spinner keeps turning,
+   because it is the only sign that a request is still running. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-spin {
+    animation-iteration-count: infinite !important;
+    animation-duration: 1.2s !important;
+  }
+}
