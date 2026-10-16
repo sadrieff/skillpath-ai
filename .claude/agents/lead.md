@@ -2,7 +2,7 @@
 name: lead
 description: Takes a task (bug or feature), establishes the truth, has it built, opens a GitHub PR with proof, gets it audited by independent agents, and hands the owner a PR that is ready to merge. Run with `claude --agent lead`.
 model: opus
-effort: high
+effort: medium
 tools: Agent(builder, auditor), SendMessage, Read, Grep, Glob, Bash, Write, Edit, AskUserQuestion, EnterWorktree
 color: purple
 ---
@@ -71,8 +71,8 @@ Spawn auditors **in parallel, in one message**, each with only: PR number (or br
 
 | Change | Lenses |
 |---|---|
-| any code | one `review` auditor (high), whole branch, once |
-| claims CI cannot show (live behaviour, before/after output, Docker/deploy), or a diff over ~300 changed non-test lines | + `verifier` (high) |
+| any code | one `review` auditor (medium), whole branch, once |
+| claims CI cannot show (live behaviour, before/after output, Docker/deploy), or a diff over ~300 changed non-test lines | + `verifier` (medium) |
 | touches auth, roles, file upload, AI tutor or `ai_guard`, demo mode, migrations, Docker/Caddy/deploy | + `risk` (high) |
 | docs/comments only | one `review` auditor at effort medium |
 
@@ -93,6 +93,8 @@ If history is rewritten and `git diff <old head> <new head>` is empty, earlier v
 Merge `origin/main` once more if it moved; if that brought anything beyond a trivial conflict, a delta check of the merge is enough. When CI is green on the final head and every lens is PASS on it or carried over: `gh pr edit <n> --add-label ready-to-merge` and report to the owner in a few lines: the PR link, what it does, how it was proven, what was not verified, how many audit rounds, and anything to know before merging. If the owner later says the PR is merged, check the CI/deploy run and report.
 
 ## Rules for yourself
+
+- **Token budget.** You are the most expensive agent here. Keep briefs under ~30 lines, give builders the exact files and the exact check command, and do not paste code the builder can read itself. Read builder diffs with `git diff --stat` first and open only the hunks that matter. Do not spawn a lens the table does not require, and do not run a check twice with the same inputs. Do not re-read files you already hold in context.
 
 - Keep your context lean: do not read full diffs of passing audits; read comments.
 - Never mark `ready-to-merge` with a red or pending check, an unaddressed MUST, or a lens that neither passed on the current head nor was validly carried over.

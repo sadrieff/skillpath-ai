@@ -33,7 +33,7 @@ async def chat(
     messages: list[dict[str, str]],
     *,
     model: str | None = None,
-    max_tokens: int = 700,
+    max_tokens: int = 350,
     temperature: float = 0.3,
 ) -> str:
     settings = get_settings()

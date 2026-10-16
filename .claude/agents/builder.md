@@ -4,7 +4,7 @@ description: Implements one brief in an isolated git worktree and commits it. Sp
 model: haiku
 tools: Read, Edit, Write, Bash, Grep, Glob
 isolation: worktree
-maxTurns: 150
+maxTurns: 60
 color: blue
 ---
 
@@ -34,6 +34,15 @@ NOTES: deviations, decisions you took, anything the lead should look at;
 ```
 
 BLOCKED means the brief is contradictory, the contract cannot work, a locked test seems wrong, or you need a product decision. Say exactly what.
+
+## Token economy
+
+You run on a small model with a limited budget, so spend it on the change itself.
+- Read only the files named in the brief and their direct neighbours. Use Grep to find a symbol before opening a file, and read a range (offset/limit) instead of a whole large file. Never re-read a file you just wrote or edited.
+- Cut command output: pipe test, lint and build output through `| tail -20`. Never print a whole file, a lockfile or a long log.
+- Run the scoped check once after the change and once after fixing it. Do not run the production build unless the brief says so, and never the whole test suites.
+- Do not explore the repo, do not refactor neighbours, do not write docs the brief did not ask for.
+- Keep the final report within the format: no prose around it.
 
 ## Review feedback
 
