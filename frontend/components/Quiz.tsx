@@ -20,6 +20,28 @@ interface QuizProps {
 
 type LoadState = "loading" | "ready" | "missing" | "error";
 
+/** Icon for a right or wrong answer: the state is shown by shape, not only by colour. */
+function ResultIcon({ correct }: { correct: boolean }) {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      aria-hidden="true"
+      className="shrink-0"
+    >
+      {correct ? (
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 12l4 4 10-10" />
+      ) : (
+        <path strokeLinecap="round" d="M6 6l12 12M18 6L6 18" />
+      )}
+    </svg>
+  );
+}
+
 export default function Quiz({ lessonId, onExplainMistake, onAttemptDone }: QuizProps) {
   const [quiz, setQuiz] = useState<QuizData | null>(null);
   const [loadState, setLoadState] = useState<LoadState>("loading");
@@ -102,12 +124,13 @@ export default function Quiz({ lessonId, onExplainMistake, onAttemptDone }: Quiz
   }
 
   const wrongCount = result ? result.results.filter((r) => !r.correct).length : 0;
+  const passed = result ? result.percent >= PASS_PERCENT : false;
 
   return (
-    <section className="card space-y-5" aria-labelledby="quiz-title">
+    <section className="card space-y-6" aria-labelledby="quiz-title">
       <div className="space-y-1">
         <p className="text-sm font-medium text-muted">Проверка знаний</p>
-        <h2 id="quiz-title" className="text-lg font-semibold text-ink">
+        <h2 id="quiz-title" className="text-xl font-bold text-ink">
           {quiz.title}
         </h2>
       </div>
@@ -115,14 +138,20 @@ export default function Quiz({ lessonId, onExplainMistake, onAttemptDone }: Quiz
       {submitError && <ErrorBox message={submitError} />}
 
       {!result && (
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-7">
           {quiz.questions.map((question, index) => (
             <fieldset key={question.id} className="space-y-3">
-              <legend className="mb-3 text-sm font-medium leading-relaxed text-ink">
-                <span className="mr-1.5 text-accent">{index + 1}.</span>
-                <InlineCode text={question.text} />
+              <legend className="mb-3 w-full">
+                <span className="flex items-start gap-3 text-base font-semibold leading-relaxed text-ink">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink text-sm font-bold text-accent-ink">
+                    {index + 1}
+                  </span>
+                  <span className="pt-1">
+                    <InlineCode text={question.text} />
+                  </span>
+                </span>
               </legend>
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {question.options.map((option, optionIndex) => {
                   const inputId = `q${question.id}-o${optionIndex}`;
                   const checked = answers[question.id] === optionIndex;
@@ -130,10 +159,8 @@ export default function Quiz({ lessonId, onExplainMistake, onAttemptDone }: Quiz
                     <label
                       key={inputId}
                       htmlFor={inputId}
-                      className={`flex min-h-11 cursor-pointer items-start gap-3 rounded border px-3.5 py-2.5 text-sm transition-colors duration-150 ${
-                        checked
-                          ? "border-accent bg-accent/15 text-ink"
-                          : "border-line bg-surface-2 text-ink hover:bg-line"
+                      className={`flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border-2 px-4 py-3 text-[0.9375rem] leading-snug text-ink transition-colors duration-150 ${
+                        checked ? "border-ink bg-surface-2" : "border-line bg-surface hover:border-muted"
                       }`}
                     >
                       <input
@@ -143,9 +170,11 @@ export default function Quiz({ lessonId, onExplainMistake, onAttemptDone }: Quiz
                         value={optionIndex}
                         checked={checked}
                         onChange={() => selectOption(question.id, optionIndex)}
-                        className="mt-0.5 h-4 w-4 shrink-0 accent-accent"
+                        className="h-5 w-5 shrink-0 cursor-pointer accent-accent"
                       />
-                      <span><InlineCode text={option} /></span>
+                      <span>
+                        <InlineCode text={option} />
+                      </span>
                     </label>
                   );
                 })}
@@ -154,7 +183,7 @@ export default function Quiz({ lessonId, onExplainMistake, onAttemptDone }: Quiz
           ))}
 
           <div className="flex flex-col gap-3 border-t border-line pt-5 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs text-muted" aria-live="polite">
+            <p className="text-sm text-muted" aria-live="polite">
               Отвечено: {answeredCount} из {quiz.questions.length}
             </p>
             <button type="submit" disabled={!allAnswered || submitting} className="btn-primary w-full sm:w-auto">
@@ -165,23 +194,25 @@ export default function Quiz({ lessonId, onExplainMistake, onAttemptDone }: Quiz
       )}
 
       {result && (
-        <div className="space-y-5">
+        <div className="space-y-6">
           <div
-            className={`rounded border p-4 ${
-              result.percent >= PASS_PERCENT
-                ? "border-success/40 bg-success/10"
-                : "border-danger/40 bg-danger/10"
-            }`}
             role="status"
+            className={`space-y-2 rounded-xl border-2 p-5 ${passed ? "border-success bg-success/10" : "border-danger bg-danger/10"}`}
           >
-            <p className="text-2xl font-bold tabular-nums text-ink">
-              {result.score} из {result.total}{" "}
-              <span className="text-base font-medium text-ink">({result.percent}%)</span>
+            <p className="text-sm font-semibold text-ink">Результат</p>
+            <p className="text-5xl font-extrabold leading-none tabular-nums text-ink">{result.percent}%</p>
+            <p className="text-base text-ink">
+              {result.score} из {result.total} верных ответов
             </p>
-            <p className="mt-1 text-sm text-ink">
-              {result.percent >= PASS_PERCENT
-                ? "Тест пройден, урок засчитан."
-                : `Для зачёта нужно не менее ${PASS_PERCENT}%. Разберите ошибки и попробуйте снова.`}
+            <p className="flex items-start gap-2 text-sm font-medium text-ink">
+              <span className={passed ? "text-success" : "text-danger"}>
+                <ResultIcon correct={passed} />
+              </span>
+              <span>
+                {passed
+                  ? "Тест пройден, урок засчитан."
+                  : `Для зачёта нужно не менее ${PASS_PERCENT}%. Разберите ошибки и попробуйте снова.`}
+              </span>
             </p>
           </div>
 
@@ -191,38 +222,44 @@ export default function Quiz({ lessonId, onExplainMistake, onAttemptDone }: Quiz
               const chosen = question?.options[item.choice_index];
               const correct = question?.options[item.correct_index];
               return (
-                <li key={item.question_id} className="space-y-2 rounded border border-line bg-surface-2 p-4">
-                  <p className="text-sm font-medium text-ink">
-                    <span className={`inline-flex items-center gap-1.5 ${item.correct ? "text-success" : "text-danger"}`}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
-                        {item.correct ? (
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 12l4 4 10-10" />
-                        ) : (
-                          <path strokeLinecap="round" d="M6 6l12 12M18 6L6 18" />
-                        )}
-                      </svg>
-                      {item.correct ? "Верно" : "Неверно"}.
-                    </span>{" "}
-                    <span className="sr-only">Вопрос </span>
-                    {index + 1}. {question?.text}
+                <li key={item.question_id} className="space-y-3 rounded-xl border border-line bg-surface p-4 shadow-card">
+                  <p
+                    className={`flex items-center gap-2 text-sm font-semibold ${item.correct ? "text-success" : "text-danger"}`}
+                  >
+                    <ResultIcon correct={item.correct} />
+                    {item.correct ? "Верно" : "Неверно"}
                   </p>
-                  <p className="text-xs text-muted">Ваш ответ: {chosen ?? "—"}</p>
-                  {!item.correct && <p className="text-xs text-ink">Правильный ответ: {correct ?? "—"}</p>}
-                  {item.explanation && <p className="text-sm text-muted"><InlineCode text={item.explanation} /></p>}
+                  <p className="text-base font-semibold leading-snug text-ink">
+                    <span className="sr-only">Вопрос </span>
+                    {index + 1}. <InlineCode text={question?.text ?? ""} />
+                  </p>
+                  <p className="text-sm text-ink">
+                    Ваш ответ: <InlineCode text={chosen ?? "—"} />
+                  </p>
+                  {!item.correct && (
+                    <p className="text-sm font-semibold text-ink">
+                      Верный ответ: <InlineCode text={correct ?? "—"} />
+                    </p>
+                  )}
+                  {item.explanation && (
+                    <p className="rounded-lg bg-surface-2 px-3.5 py-2.5 text-sm leading-relaxed text-ink">
+                      <InlineCode text={item.explanation} />
+                    </p>
+                  )}
                 </li>
               );
             })}
           </ol>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <button type="button" onClick={resetAttempt} className="btn-secondary">
+            <button type="button" onClick={resetAttempt} className="btn-secondary w-full sm:w-auto">
               Пройти снова
             </button>
             {wrongCount > 0 && (
               <button
                 type="button"
                 onClick={() => onExplainMistake(result.attempt_id)}
-                className="btn-primary"
+                className="btn-primary w-full sm:w-auto"
               >
                 Разобрать ошибки с ИИ
               </button>

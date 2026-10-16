@@ -163,12 +163,12 @@ export default function LessonForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="space-y-5 rounded border border-line bg-ground/60 p-4 sm:p-5" aria-label={editing ? "Редактирование урока" : "Новый урок"}>
-      <h4 className="font-semibold text-ink">{editing ? "Редактирование урока" : "Новый урок"}</h4>
+    <form onSubmit={handleSubmit} noValidate className="card space-y-6 sm:p-6" aria-label={editing ? "Редактирование урока" : "Новый урок"}>
+      <h4 className="text-lg font-bold text-ink">{editing ? "Редактирование урока" : "Новый урок"}</h4>
 
       {serverError && <ErrorBox message={serverError} />}
 
-      <div className="grid gap-5 sm:grid-cols-[minmax(0,1fr)_140px]">
+      <div className="grid gap-6 sm:grid-cols-[minmax(0,1fr)_140px]">
         <Field label="Название *" error={errors.title} className="sm:col-span-2">
           {(control) => (
             <input
@@ -210,7 +210,7 @@ export default function LessonForm({
             value={content}
             onChange={(e) => setContent(e.target.value)}
             rows={12}
-            className="input resize-y font-mono text-[13px] leading-relaxed"
+            className="input resize-y font-mono text-sm leading-relaxed"
           />
         )}
       </Field>
@@ -231,8 +231,8 @@ export default function LessonForm({
         )}
       </Field>
 
-      <div className="space-y-3 rounded border border-line bg-surface-2 p-4">
-        <p className="text-sm font-medium text-ink">Материал к уроку</p>
+      <div className="space-y-4 rounded-lg border border-line bg-surface-2 p-4">
+        <p className="text-sm font-semibold text-ink">Материал к уроку</p>
         <Field label="Файл (PDF, PNG, JPG, TXT, MD, до 10 МБ)" error={uploadError ?? undefined}>
           {(control) => (
             <input
@@ -268,14 +268,14 @@ export default function LessonForm({
           <button
             type="button"
             onClick={() => setMaterialUrl("")}
-            className="inline-flex min-h-11 items-center text-xs font-medium text-danger hover:underline"
+            className="inline-flex min-h-11 items-center text-sm font-semibold text-danger hover:underline"
           >
             Убрать материал
           </button>
         )}
       </div>
 
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+      <div className="flex flex-col-reverse gap-3 border-t border-line pt-6 sm:flex-row sm:justify-end">
         <button type="button" onClick={onCancel} disabled={busy || uploading} className="btn-secondary">
           Отмена
         </button>

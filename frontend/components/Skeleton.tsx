@@ -5,5 +5,5 @@ interface SkeletonProps {
 
 /** Placeholder block shown while data loads. Decorative, so it is hidden from screen readers. */
 export default function Skeleton({ className = "" }: SkeletonProps) {
-  return <div aria-hidden="true" className={`animate-pulse rounded bg-surface ${className}`} />;
+  return <div aria-hidden="true" className={`animate-pulse rounded-xl bg-surface-2 ${className}`} />;
 }

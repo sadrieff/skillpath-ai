@@ -5,7 +5,7 @@ import ErrorBox from "@/components/ErrorBox";
 import Spinner from "@/components/Spinner";
 import { ApiError, adminDeleteQuiz, adminGetQuiz, adminListCourses, errorMessage } from "@/lib/api";
 import type { AdminCourse, AdminQuiz } from "@/lib/types";
-import { Field, SectionTitle } from "./ui";
+import { dangerButton, Field, SectionTitle } from "./ui";
 import QuizForm from "./QuizForm";
 import { useCourseTree } from "./useCourseTree";
 
@@ -186,7 +186,7 @@ export default function AdminQuizzes() {
       {quizError && <ErrorBox message={quizError} />}
 
       {showEditor && (
-        <section className="card space-y-6 sm:p-6">
+        <section className="card space-y-6 sm:p-8">
           <SectionTitle
             actions={
               hasQuiz ? (
@@ -194,7 +194,7 @@ export default function AdminQuizzes() {
                   type="button"
                   onClick={removeQuiz}
                   disabled={deleting}
-                  className="inline-flex min-h-11 items-center justify-center rounded border border-danger/40 bg-danger/10 px-4 py-2 text-sm font-semibold text-danger transition hover:bg-danger/20 disabled:opacity-60"
+                  className={dangerButton}
                 >
                   {deleting ? "Удаляем…" : "Удалить тест"}
                 </button>
@@ -204,7 +204,7 @@ export default function AdminQuizzes() {
             {hasQuiz ? "Редактирование теста" : "Новый тест"}
           </SectionTitle>
           {!hasQuiz && (
-            <p className="text-sm text-muted">У этого урока пока нет теста. Заполните форму и сохраните.</p>
+            <p className="text-base text-muted">У этого урока пока нет теста. Заполните форму и сохраните.</p>
           )}
           {deleteError && <ErrorBox message={deleteError} />}
           <QuizForm

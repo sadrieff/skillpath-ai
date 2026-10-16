@@ -73,14 +73,14 @@ export default function CourseForm({ initial, onSubmit, onCancel }: CourseFormPr
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="card space-y-5 sm:p-6" aria-labelledby="course-form-title">
-      <h3 id="course-form-title" className="text-lg font-semibold text-ink">
+    <form onSubmit={handleSubmit} noValidate className="card space-y-6 sm:p-8" aria-labelledby="course-form-title">
+      <h3 id="course-form-title" className="text-xl font-bold text-ink">
         {initial ? "Редактирование курса" : "Новый курс"}
       </h3>
 
       {serverError && <ErrorBox message={serverError} />}
 
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid gap-6 sm:grid-cols-2">
         <Field label="Название *" error={errors.title} className="sm:col-span-2">
           {(control) => (
             <input
@@ -158,7 +158,7 @@ export default function CourseForm({ initial, onSubmit, onCancel }: CourseFormPr
         </Field>
       </div>
 
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+      <div className="flex flex-col-reverse gap-3 border-t border-line pt-6 sm:flex-row sm:justify-end">
         <button type="button" onClick={onCancel} disabled={busy} className="btn-secondary">
           Отмена
         </button>

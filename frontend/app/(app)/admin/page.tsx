@@ -38,8 +38,8 @@ function AdminContent() {
   if (!isAdmin) {
     return (
       <div className="card max-w-lg space-y-2">
-        <h1 className="text-xl font-semibold text-ink">Нет доступа</h1>
-        <p className="text-sm text-muted">Раздел доступен только администраторам. Открываем дашборд.</p>
+        <h1 className="text-[2.5rem] font-extrabold leading-tight text-ink">Нет доступа</h1>
+        <p className="text-base text-muted">Раздел доступен только администраторам. Открываем дашборд.</p>
       </div>
     );
   }
@@ -60,13 +60,13 @@ function AdminContent() {
   }
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-2xl font-bold text-ink sm:text-3xl">Администрирование</h1>
+    <div className="space-y-10">
+      <h1 className="text-[2.5rem] font-extrabold leading-tight text-ink">Администрирование</h1>
 
       <div
         role="tablist"
         aria-label="Разделы администрирования"
-        className="flex gap-1 overflow-x-auto rounded border border-line bg-surface p-1"
+        className="flex gap-6 overflow-x-auto border-b border-line"
       >
         {TABS.map((item) => {
           const selected = tab === item.id;
@@ -84,8 +84,10 @@ function AdminContent() {
               tabIndex={selected ? 0 : -1}
               onClick={() => setTab(item.id)}
               onKeyDown={handleTabKeyDown}
-              className={`min-h-11 shrink-0 rounded px-4 py-2 text-sm font-medium transition-colors duration-150 ${
-                selected ? "bg-accent text-accent-ink" : "text-muted hover:bg-surface-2 hover:text-ink"
+              className={`min-h-11 shrink-0 border-b-4 px-1 pb-2 pt-2.5 text-[1.0625rem] transition-colors duration-150 ${
+                selected
+                  ? "border-accent font-bold text-ink"
+                  : "border-transparent font-medium text-muted hover:text-ink"
               }`}
             >
               {item.label}

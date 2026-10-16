@@ -6,17 +6,16 @@ const token = (name) => `rgb(var(--c-${name}) / <alpha-value>)`;
 module.exports = {
   content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}', './lib/**/*.{ts,tsx}'],
   theme: {
-    // One radius for the whole app.
     borderRadius: {
       none: '0',
-      DEFAULT: '6px',
       sm: '6px',
-      md: '6px',
-      lg: '6px',
-      xl: '6px',
-      '2xl': '6px',
-      '3xl': '6px',
-      full: '6px',
+      DEFAULT: '10px',
+      md: '10px',
+      lg: '12px',
+      xl: '16px',
+      '2xl': '20px',
+      '3xl': '28px',
+      full: '9999px',
     },
     extend: {
       colors: {
@@ -32,6 +31,10 @@ module.exports = {
         },
         danger: token('danger'),
         success: token('success'),
+      },
+      boxShadow: {
+        card: '0 1px 2px rgb(26 26 46 / 0.05), 0 8px 24px -12px rgb(26 26 46 / 0.14)',
+        lift: '0 2px 4px rgb(26 26 46 / 0.06), 0 16px 32px -14px rgb(26 26 46 / 0.22)',
       },
       fontFamily: {
         sans: ['var(--font-onest)', 'system-ui', 'sans-serif'],

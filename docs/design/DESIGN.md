@@ -1,36 +1,45 @@
-# SkillPath AI — design brief
+# SkillPath AI: дизайн, версия 2
 
-Sources: ui-ux-pro-max (rules, tokens), design-taste-frontend / taste-skill (landing direction), web-design-guidelines (audit).
-Full landing direction sheet: `docs/design/taste-sheet-landing.md` (seed 5644890, direction `type-only-statement`).
+Светлая учебная тема. Версия 1 (тёмно-синяя с лаймовым акцентом) отклонена владельцем: одинаковые карточки, холодные цвета, мелкая типографика, разрозненное расположение.
 
-## Decisions and deviations from the dealt sheet (record in the report)
-1. **Type: Onest** (display 700-800, text 400-500) via `next/font/google` with `subsets: ['latin','cyrillic']`.
-   Dealt face Red Hat Display has no Cyrillic glyphs → redrawn for coverage.
-2. **Colour: keep the product's dark navy ground, replace violet.** House rules ban violet/indigo accents and the
-   dealt "candy chapters" palette would clash with the dark app. Tokens (single source, `tailwind.config.js` + CSS vars):
-   - ground `#0b1020`, surface `#121936`, surface-2 `#1a2347`, ink `#f2f5ff`, muted `#aab3d6` (>= 4.5:1 on ground)
-   - accent `#c8f169` (lime), accent-ink `#0b1020`; danger `#ff6b6b`; success `#5ee6a8`
-   - Landing may use one inverted field (ground ↔ ink) for CTA and footer.
-   Replace the old violet token usage everywhere (`accent`, `btn-primary`, progress bars, focus rings).
-3. **Hero live thing:** instead of variable-font chips, the hero carries a working mini-quiz (2 questions about Python,
-   real content). Wrong answer → an "ИИ-наставник" response appears with a short explanation (static canned text, no API call).
-   Idea sentence: "On this page, **the mistake in a quiz** becomes **the explanation the tutor writes back**."
-4. Everything else from the sheet is adopted: statement hero (2 lines, 9–14vw, full width), capabilities-as-menu,
-   call-and-response column, headline-you-can-type, large-questions FAQ, inverted CTA, wordmark footer.
+## Принципы
 
-## House rules that apply to the landing (measured by inspect.mjs)
-No eyebrows/pill badges, no monospace outside code, no index numbering, no thin rules, no gradients, no shadows at rest,
-no icon-topped card rows, no glass/blur, no emoji, <= 2 typefaces, headlines <= 2 lines at every width,
-running text >= 16px, nothing smaller than 13px, >= 4 real pictures (SVG drawings do not count), one moving picture if an honest clip exists.
-Real pictures: search the open collections with `assets.mjs` (education/learning/old classroom/blackboard/library engravings),
-download with `--get`, credit in the footer (`--credits`). They depict the world, never "our students/team".
+- Выглядит как учебная платформа, а не как админка: тёплая бумага, белые карточки, цветные обложки курсов.
+- Карточки не одинаковые: у каждого курса свой цвет обложки (`lib/courseTheme.ts`), есть одна крупная «главная» карточка на экран, статистика без рамок.
+- Одна сетка: контейнер `max-w-6xl`, отступы по бокам 16/24/32 px, вертикальный ритм 24/40/64 px.
+- Крупная типографика: h1 40-56 px (800), h2 28-32 px (700), текст 17 px, мелкий 14 px. Не меньше 14 px.
+- Один шрифт: Onest.
 
-## App screens (dashboard, catalog, course, lesson, admin) — ui-ux-pro-max rules
-- Contrast >= 4.5:1; visible focus ring (accent) on every interactive element; labels on all inputs; `aria-label` on icon-only buttons.
-- Touch targets >= 44px; hover never the only affordance; loading skeletons/spinners; empty and error states for each list.
-- SVG icons (lucide-style inline), no emoji icons; semantic HTML (`main`, `nav`, `section`, headings in order).
-- Motion: 150–300ms transform/opacity only, `prefers-reduced-motion` respected.
-- Responsive at 375 / 768 / 1024 / 1440, no horizontal scroll; `<meta viewport>` default of Next.
-- Quiz: progress shown, answered state is not colour-only (icon + text), explanation next to the answer.
-- AI tutor panel: clear "ответ сгенерирован ИИ" note, loading indicator, retry on error, keyboard submit (Ctrl+Enter).
-- Charts/progress: percent shown as text next to the bar (not colour alone).
+## Токены (`app/globals.css`, `tailwind.config.js`)
+
+| Роль | Класс Tailwind | Значение |
+|---|---|---|
+| Фон страницы | `bg-ground` | #f4f1ea |
+| Карточка | `bg-surface` | #ffffff |
+| Вложенное, дорожка прогресса, чип | `bg-surface-2` | #ece8de |
+| Граница | `border-line` | #ddd8ca |
+| Текст | `text-ink` | #1a1a2e |
+| Второстепенный текст | `text-muted` | #5f6277 |
+| Акцент (кнопки, активное, прогресс) | `bg-accent` / `text-accent` | #d63a12, белый текст `text-accent-ink` |
+| Ошибка / успех | `danger` / `success` | #c62828 / #1e7a46 |
+
+Скругления: `rounded` 10, `rounded-lg` 12, `rounded-xl` 16 (карточки), `rounded-2xl` 20 (крупные блоки), `rounded-full` (чипы). Тени: `shadow-card` в покое, `shadow-lift` при наведении. Готовые классы: `.btn-primary`, `.btn-secondary`, `.card`, `.input`, `.chip`.
+
+Цвета курсов: `courseTheme(category, id)` даёт `{ bg, fg }`. Обложки, значки и номера на карточках курса красятся через `style={{ background: theme.bg, color: theme.fg }}`.
+
+## Экраны
+
+- **Шапка.** Белая, снизу граница. Слева название с акцентной точкой, ссылки с подчёркиванием активной, справа круг с инициалами и «Выйти» текстом. Плашка демо-стенда: тонкая полоса цвета `ink` с белым текстом.
+- **Дашборд.** Крупное приветствие. «Продолжить»: большая карточка с цветом курса, название урока, крупная кнопка. Статистика одной строкой из четырёх чисел без рамок. «Мои курсы»: карточки с цветными обложками. Последние тесты: список со значком результата.
+- **Каталог.** Заголовок, поиск, категории чипами, уровень переключателем. Карточка курса: цветная обложка сверху (категория, уровень), ниже название 20 px, описание, мета, прогресс, действие.
+- **Страница курса.** Цветная шапка курса, название, чипы, кнопка записи. Ниже модули списком карточек с нумерованными уроками и кружками выполнения, справа липкая карточка прогресса.
+- **Урок.** Колонка чтения до 720 px, крупный текст. Справа липкие тест и наставник. Варианты ответов: крупные скруглённые карточки с видимым выбранным состоянием, верно и неверно показываются иконкой и текстом, а не только цветом. Реплики наставника как сообщения.
+- **Админка.** Подчёркнутые вкладки, курсы таблицей, формы в белых карточках.
+- **Лендинг.** Те же токены, карточки разных цветов вместо одинаковых, мини-тест на белой карточке с тенью.
+
+## Правила
+
+- Контраст текста не ниже 4.5:1, фокус виден, цель нажатия не ниже 44 px, нет горизонтальной прокрутки на 390 px.
+- Значки только SVG, без эмодзи. Верно/неверно не только цветом.
+- Анимации 150-250 мс, только transform и opacity, с учётом `prefers-reduced-motion`.
+- Тексты по-русски, без лозунгов (см. `CLAUDE.md`).

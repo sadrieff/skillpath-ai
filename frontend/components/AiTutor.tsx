@@ -160,10 +160,10 @@ export default function AiTutor({ lessonId, mistakeRequest }: AiTutorProps) {
   }
 
   return (
-    <section id="ai-tutor" className="card flex flex-col gap-4 scroll-mt-24" aria-labelledby="ai-tutor-title">
+    <section id="ai-tutor" className="card flex flex-col gap-5 scroll-mt-24" aria-labelledby="ai-tutor-title">
       <div className="space-y-1">
         <p className="text-sm font-medium text-muted">ИИ-наставник</p>
-        <h2 id="ai-tutor-title" className="text-lg font-semibold text-ink">
+        <h2 id="ai-tutor-title" className="text-xl font-bold text-ink">
           Вопрос по теме урока
         </h2>
       </div>
@@ -175,7 +175,7 @@ export default function AiTutor({ lessonId, mistakeRequest }: AiTutorProps) {
             type="button"
             onClick={() => void ask(quick.mode)}
             disabled={busy}
-            className="btn-secondary !px-3.5 !py-2 text-xs"
+            className="btn-secondary rounded-full px-4 text-sm"
           >
             {quick.label}
           </button>
@@ -184,7 +184,7 @@ export default function AiTutor({ lessonId, mistakeRequest }: AiTutorProps) {
 
       <div
         ref={chatRef}
-        className="flex max-h-[420px] min-h-[120px] flex-col gap-3 overflow-y-auto rounded border border-line bg-ground/60 p-3"
+        className="flex max-h-[460px] min-h-[160px] flex-col gap-3 overflow-y-auto rounded-xl border border-line bg-surface-2 p-3 sm:p-4"
         role="log"
         aria-live="polite"
         aria-label="История диалога с наставником"
@@ -192,46 +192,62 @@ export default function AiTutor({ lessonId, mistakeRequest }: AiTutorProps) {
         {historyLoading && <Spinner label="Загружаем историю…" />}
         {historyError && <ErrorBox message={historyError} />}
         {!historyLoading && !historyError && items.length === 0 && (
-          <p className="m-auto text-center text-sm text-muted">
+          <p className="m-auto px-2 text-center text-sm text-muted">
             Выберите быстрый запрос или задайте свой вопрос.
           </p>
         )}
-        {items.map((item) => (
-          <div
-            key={item.id}
-            className={`flex ${item.role === "user" ? "justify-end" : "justify-start"}`}
-          >
-            <div
-              className={`max-w-[90%] rounded px-3.5 py-2.5 text-sm leading-relaxed ${item.role === "user" ? "whitespace-pre-wrap" : ""} ${
-                item.role === "user"
-                  ? "bg-accent/25 text-ink"
-                  : item.failed
-                    ? "border border-danger/40 bg-danger/10 text-danger"
-                    : "bg-surface-2 text-ink"
-              } ${item.clamp ? "line-clamp-3" : ""}`}
-            >
-              <span className="sr-only">{item.role === "user" ? "Вы: " : "Наставник: "}</span>
-              {item.role === "assistant" && !item.failed ? (
-                <div className="prose-sp !text-sm">
+        {items.map((item) =>
+          item.role === "user" ? (
+            <div key={item.id} className="flex justify-end">
+              <div
+                className={`max-w-[85%] whitespace-pre-wrap rounded-2xl bg-ink px-4 py-3 text-[0.9375rem] leading-relaxed text-accent-ink ${
+                  item.clamp ? "line-clamp-3" : ""
+                }`}
+              >
+                <span className="sr-only">Вы: </span>
+                {item.text}
+              </div>
+            </div>
+          ) : item.failed ? (
+            <div key={item.id} className="flex justify-start">
+              <div className="flex max-w-[92%] items-start gap-2.5 rounded-2xl border border-danger bg-danger/10 px-4 py-3 text-[0.9375rem] leading-relaxed text-ink">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.25"
+                  aria-hidden="true"
+                  className="mt-0.5 shrink-0 text-danger"
+                >
+                  <path strokeLinecap="round" d="M12 8v5m0 3h.01M10.3 3.9L2.6 17.4A2 2 0 004.3 20.4h15.4a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z" />
+                </svg>
+                <span>{item.text}</span>
+              </div>
+            </div>
+          ) : (
+            <div key={item.id} className="flex justify-start">
+              <div className="max-w-[92%] rounded-2xl border border-line bg-surface px-4 py-3 text-ink shadow-card">
+                <span className="sr-only">Наставник: </span>
+                <div className="prose-sp !text-sm [&_h1]:!mt-4 [&_h1]:!text-base [&_h2]:!mt-4 [&_h2]:!text-base [&_h3]:!mt-3 [&_h3]:!text-sm">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.text}</ReactMarkdown>
                 </div>
-              ) : (
-                item.text
-              )}
+              </div>
             </div>
-          </div>
-        ))}
+          ),
+        )}
         {busy && (
           <div className="flex justify-start">
-            <div className="rounded bg-surface-2 px-3.5 py-2.5">
+            <div className="rounded-2xl border border-line bg-surface px-4 py-3">
               <Spinner label="Наставник думает…" />
             </div>
           </div>
         )}
       </div>
 
-      <form onSubmit={handleQuestionSubmit} className="space-y-2">
-        <label htmlFor="ai-question" className="block text-sm font-medium text-ink">
+      <form onSubmit={handleQuestionSubmit} className="space-y-3">
+        <label htmlFor="ai-question" className="block text-sm font-semibold text-ink">
           Ваш вопрос
         </label>
         <textarea
@@ -244,17 +260,17 @@ export default function AiTutor({ lessonId, mistakeRequest }: AiTutorProps) {
           placeholder="Например, почему это работает именно так…"
           className="input resize-y"
         />
-        <div className="flex items-center justify-between gap-3">
-          <span className="text-xs text-muted">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <span className="text-sm text-muted">
             {question.length}/{MAX_QUESTION_LENGTH} · Ctrl+Enter — отправить
           </span>
-          <button type="submit" disabled={!trimmed || busy} className="btn-primary !py-2">
+          <button type="submit" disabled={!trimmed || busy} className="btn-primary w-full sm:w-auto">
             Спросить
           </button>
         </div>
       </form>
 
-      <p className="text-xs leading-relaxed text-muted">
+      <p className="text-sm leading-relaxed text-muted">
         Ответы наставника сгенерированы ИИ автоматически и могут содержать ошибки. Сверяйте важные факты с
         материалами урока.
       </p>

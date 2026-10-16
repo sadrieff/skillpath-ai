@@ -13,7 +13,7 @@ import {
 } from "@/lib/api";
 import type { AdminCourse, LessonBrief, ModuleInput, ModuleTree } from "@/lib/types";
 import LessonForm from "./LessonForm";
-import { focusFirstInvalid, Field, SectionTitle, parseNonNegativeInt } from "./ui";
+import { dangerButton, focusFirstInvalid, Field, SectionTitle, parseNonNegativeInt } from "./ui";
 import { useCourseTree } from "./useCourseTree";
 
 type Editor =
@@ -101,8 +101,8 @@ export default function AdminStructure() {
   const modules = tree ? byPosition(tree.modules) : [];
 
   return (
-    <div className="space-y-6">
-      <section className="card space-y-4">
+    <div className="space-y-10">
+      <section className="card space-y-5 sm:p-6">
         <div className="max-w-md">
           <Field label="Курс">
             {(control) => (
@@ -153,15 +153,17 @@ export default function AdminStructure() {
           </SectionTitle>
 
           {editor?.kind === "module" && !editor.module && (
-            <ModuleForm
-              initialPosition={nextPosition(modules)}
-              onSubmit={(values) => saveModule(values)}
-              onCancel={() => setEditor(null)}
-            />
+            <div className="card sm:p-6">
+              <ModuleForm
+                initialPosition={nextPosition(modules)}
+                onSubmit={(values) => saveModule(values)}
+                onCancel={() => setEditor(null)}
+              />
+            </div>
           )}
 
           {modules.length === 0 && (
-            <div className="card text-sm text-muted">В курсе пока нет модулей.</div>
+            <div className="card text-base text-muted">В курсе пока нет модулей.</div>
           )}
 
           {modules.map((module, moduleIndex) => {
@@ -169,7 +171,7 @@ export default function AdminStructure() {
             const editingThis = editor?.kind === "module" && editor.module?.id === module.id;
             const addingLesson = editor?.kind === "lesson" && editor.moduleId === module.id && !editor.lesson;
             return (
-              <div key={module.id} className="card !p-0">
+              <div key={module.id} className="card overflow-hidden !p-0">
                 <div className="space-y-4 border-b border-line px-5 py-4">
                   {editingThis ? (
                     <ModuleForm
@@ -181,16 +183,16 @@ export default function AdminStructure() {
                   ) : (
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0">
-                        <p className="text-xs text-muted">
+                        <p className="text-sm text-muted">
                           Модуль {moduleIndex + 1} · порядок {module.position}
                         </p>
-                        <h3 className="font-semibold text-ink">{module.title}</h3>
+                        <h3 className="text-lg font-bold text-ink">{module.title}</h3>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <button
                           type="button"
                           onClick={() => setEditor({ kind: "module", module })}
-                          className="btn-secondary !py-2"
+                          className="btn-secondary"
                           aria-label={`Изменить модуль «${module.title}»`}
                         >
                           Изменить
@@ -199,7 +201,7 @@ export default function AdminStructure() {
                           type="button"
                           onClick={() => removeModule(module)}
                           disabled={busyKey === `module-${module.id}`}
-                          className="inline-flex min-h-11 items-center justify-center rounded border border-danger/40 bg-danger/10 px-4 py-2 text-sm font-semibold text-danger transition hover:bg-danger/20 disabled:opacity-60"
+                          className={dangerButton}
                           aria-label={`Удалить модуль «${module.title}»`}
                         >
                           Удалить
@@ -232,14 +234,14 @@ export default function AdminStructure() {
                         ) : (
                           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div className="flex min-w-0 items-center gap-3">
-                              <span className="w-8 shrink-0 text-xs text-muted">#{lesson.position}</span>
-                              <span className="truncate text-sm text-ink">{lesson.title}</span>
+                              <span className="w-10 shrink-0 text-sm text-muted">#{lesson.position}</span>
+                              <span className="truncate text-base text-ink">{lesson.title}</span>
                             </div>
                             <div className="flex flex-wrap gap-2">
                               <button
                                 type="button"
                                 onClick={() => setEditor({ kind: "lesson", moduleId: module.id, lesson })}
-                                className="btn-secondary !py-1.5 text-xs"
+                                className="btn-secondary"
                                 aria-label={`Изменить урок «${lesson.title}»`}
                               >
                                 Изменить
@@ -248,7 +250,7 @@ export default function AdminStructure() {
                                 type="button"
                                 onClick={() => removeLesson(lesson)}
                                 disabled={busyKey === `lesson-${lesson.id}`}
-                                className="inline-flex min-h-11 items-center justify-center rounded border border-danger/40 bg-danger/10 px-3 py-1.5 text-xs font-semibold text-danger transition hover:bg-danger/20 disabled:opacity-60"
+                                className={dangerButton}
                                 aria-label={`Удалить урок «${lesson.title}»`}
                               >
                                 Удалить
@@ -276,7 +278,7 @@ export default function AdminStructure() {
                     <button
                       type="button"
                       onClick={() => setEditor({ kind: "lesson", moduleId: module.id })}
-                      className="btn-secondary !py-2 text-xs"
+                      className="btn-secondary"
                     >
                       + Добавить урок
                     </button>
@@ -328,9 +330,9 @@ function ModuleForm({ initialTitle = "", initialPosition, onSubmit, onCancel }: 
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="space-y-4" aria-label="Форма модуля">
+    <form onSubmit={handleSubmit} noValidate className="space-y-6" aria-label="Форма модуля">
       {serverError && <ErrorBox message={serverError} />}
-      <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_140px]">
+      <div className="grid gap-6 sm:grid-cols-[minmax(0,1fr)_140px]">
         <Field label="Название модуля *" error={titleError}>
           {(control) => (
             <input
@@ -360,10 +362,10 @@ function ModuleForm({ initialTitle = "", initialPosition, onSubmit, onCancel }: 
         </Field>
       </div>
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-        <button type="button" onClick={onCancel} disabled={busy} className="btn-secondary !py-2">
+        <button type="button" onClick={onCancel} disabled={busy} className="btn-secondary">
           Отмена
         </button>
-        <button type="submit" disabled={busy} className="btn-primary !py-2">
+        <button type="submit" disabled={busy} className="btn-primary">
           {busy ? "Сохраняем…" : "Сохранить модуль"}
         </button>
       </div>

@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import ErrorBox from "@/components/ErrorBox";
 import { adminUpsertQuiz, errorMessage } from "@/lib/api";
 import type { AdminQuiz, QuizUpsertInput } from "@/lib/types";
-import { Field, focusFirstInvalid } from "./ui";
+import { dangerButton, ErrorText, Field, focusFirstInvalid } from "./ui";
 
 const MIN_OPTIONS = 2;
 const MAX_OPTIONS = 6;
@@ -168,7 +168,7 @@ export default function QuizForm({ lessonId, initial, onSaved }: QuizFormProps) 
     <form onSubmit={handleSubmit} noValidate className="space-y-6" aria-label="Редактор теста">
       {serverError && <ErrorBox message={serverError} />}
       {saved && !serverError && (
-        <p role="status" className="rounded border border-success/40 bg-success/10 p-3 text-sm text-success">
+        <p role="status" className="rounded-lg border border-success/40 bg-success/10 p-3 text-sm font-medium text-success">
           Тест сохранён.
         </p>
       )}
@@ -187,19 +187,19 @@ export default function QuizForm({ lessonId, initial, onSaved }: QuizFormProps) 
         )}
       </Field>
 
-      {errors.list && <p className="text-sm text-danger">{errors.list}</p>}
+      {errors.list && <ErrorText>{errors.list}</ErrorText>}
 
-      <ol className="space-y-5">
+      <ol className="space-y-6">
         {questions.map((q, qIndex) => {
           const qErrors = errors.questions[q.key] ?? {};
           return (
-            <li key={q.key} className="space-y-4 rounded border border-line bg-ground/60 p-4 sm:p-5">
+            <li key={q.key} className="card space-y-5 sm:p-6">
               <div className="flex items-center justify-between gap-3">
-                <h4 className="font-semibold text-ink">Вопрос {qIndex + 1}</h4>
+                <h4 className="text-lg font-bold text-ink">Вопрос {qIndex + 1}</h4>
                 <button
                   type="button"
                   onClick={() => removeQuestion(q.key)}
-                  className="inline-flex min-h-11 items-center text-xs font-medium text-danger hover:underline"
+                  className="inline-flex min-h-11 items-center text-sm font-semibold text-danger hover:underline"
                   aria-label={`Удалить вопрос ${qIndex + 1}`}
                 >
                   Удалить вопрос
@@ -220,21 +220,24 @@ export default function QuizForm({ lessonId, initial, onSaved }: QuizFormProps) 
               </Field>
 
               <fieldset className="space-y-2" aria-describedby={qErrors.options ? `opt-err-${q.key}` : undefined}>
-                <legend className="mb-2 text-sm font-medium text-ink">
+                <legend className="mb-2 text-sm font-semibold text-ink">
                   Варианты ответа (отметьте верный) *
                 </legend>
                 {q.options.map((option, oIndex) => {
                   const inputId = `${q.key}-opt-${oIndex}`;
                   return (
-                    <div key={inputId} className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        name={`correct-${q.key}`}
-                        checked={q.correctIndex === oIndex}
-                        onChange={() => updateQuestion(q.key, { correctIndex: oIndex })}
-                        aria-label={`Вариант ${oIndex + 1} верный`}
-                        className="h-4 w-4 shrink-0 accent-accent"
-                      />
+                    <div key={inputId} className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                      <label className="flex min-h-11 shrink-0 cursor-pointer items-center gap-2 text-sm text-muted">
+                        <input
+                          type="radio"
+                          name={`correct-${q.key}`}
+                          checked={q.correctIndex === oIndex}
+                          onChange={() => updateQuestion(q.key, { correctIndex: oIndex })}
+                          aria-label={`Вариант ${oIndex + 1} верный`}
+                          className="h-5 w-5 shrink-0 accent-accent"
+                        />
+                        <span>верный</span>
+                      </label>
                       <input
                         type="text"
                         value={option}
@@ -242,16 +245,16 @@ export default function QuizForm({ lessonId, initial, onSaved }: QuizFormProps) 
                         aria-label={`Вариант ${oIndex + 1}`}
                         aria-invalid={Boolean(qErrors.options) && !option.trim()}
                         maxLength={500}
-                        className="input !py-2"
+                        className="input min-w-0 flex-1 basis-48"
                       />
                       <button
                         type="button"
                         onClick={() => removeOption(q.key, oIndex)}
                         disabled={q.options.length <= MIN_OPTIONS}
                         aria-label={`Удалить вариант ${oIndex + 1}`}
-                        className="btn-secondary !px-3 !py-2 shrink-0"
+                        className={dangerButton}
                       >
-                        <span aria-hidden="true">×</span>
+                        Удалить
                       </button>
                     </div>
                   );
@@ -261,19 +264,15 @@ export default function QuizForm({ lessonId, initial, onSaved }: QuizFormProps) 
                     type="button"
                     onClick={() => addOption(q.key)}
                     disabled={q.options.length >= MAX_OPTIONS}
-                    className="btn-secondary !py-1.5 text-xs"
+                    className="btn-secondary"
                   >
                     + Вариант
                   </button>
-                  <span className="text-xs text-muted">
+                  <span className="text-sm text-muted">
                     {q.options.length} из {MAX_OPTIONS}
                   </span>
                 </div>
-                {qErrors.options && (
-                  <p id={`opt-err-${q.key}`} className="text-xs text-danger">
-                    {qErrors.options}
-                  </p>
-                )}
+                {qErrors.options && <ErrorText id={`opt-err-${q.key}`}>{qErrors.options}</ErrorText>}
               </fieldset>
 
               <Field label="Пояснение (необязательно)" hint="Показывается ученику после ответа.">
@@ -293,7 +292,7 @@ export default function QuizForm({ lessonId, initial, onSaved }: QuizFormProps) 
         })}
       </ol>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between">
         <button
           type="button"
           onClick={() => setQuestions((prev) => [...prev, emptyQuestion()])}
@@ -305,7 +304,7 @@ export default function QuizForm({ lessonId, initial, onSaved }: QuizFormProps) 
           {busy ? "Сохраняем…" : "Сохранить тест"}
         </button>
       </div>
-      <p className="text-xs text-muted">Сохранение заменяет весь тест урока целиком.</p>
+      <p className="text-sm text-muted">Сохранение заменяет весь тест урока целиком.</p>
     </form>
   );
 }

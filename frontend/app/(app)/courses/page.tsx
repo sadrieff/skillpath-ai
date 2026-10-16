@@ -11,6 +11,12 @@ import type { CourseCard as CourseCardData, CourseLevel, CourseList } from "@/li
 
 const PAGE_SIZE = 12;
 const LEVELS: CourseLevel[] = ["beginner", "intermediate", "advanced"];
+const LEVEL_OPTIONS: (CourseLevel | "")[] = ["", ...LEVELS];
+
+const CHIP_BASE =
+  "inline-flex min-h-11 items-center rounded-full border px-4 text-[0.9375rem] font-semibold transition-colors duration-150";
+const CHIP_ON = "border-accent bg-accent text-accent-ink";
+const CHIP_OFF = "border-line bg-surface text-ink hover:bg-surface-2";
 
 export default function CoursesPage() {
   const { user, loading: authLoading } = useAuth();
@@ -96,7 +102,7 @@ export default function CoursesPage() {
   function renderAction(course: CourseCardData) {
     if (!user) {
       return (
-        <Link href="/" className="btn-secondary w-full !py-2">
+        <Link href="/" className="btn-secondary w-full">
           Войдите, чтобы записаться
         </Link>
       );
@@ -105,14 +111,14 @@ export default function CoursesPage() {
     if (course.enrolled) {
       return (
         <div className="flex gap-2">
-          <Link href={`/courses/${course.id}`} className="btn-primary flex-1 !py-2">
+          <Link href={`/courses/${course.id}`} className="btn-primary flex-1">
             Открыть
           </Link>
           <button
             type="button"
             disabled={busy}
             onClick={() => toggleEnroll(course)}
-            className="btn-secondary !py-2"
+            className="btn-secondary"
           >
             {busy ? "Отписываем…" : "Отписаться"}
           </button>
@@ -124,7 +130,7 @@ export default function CoursesPage() {
         type="button"
         disabled={busy}
         onClick={() => toggleEnroll(course)}
-        className="btn-primary w-full !py-2"
+        className="btn-primary w-full"
       >
         {busy ? "Записываем…" : "Записаться"}
       </button>
@@ -132,16 +138,16 @@ export default function CoursesPage() {
   }
 
   return (
-    <div className="space-y-8">
-      <header className="space-y-2">
-        <h1 className="text-2xl font-bold text-ink sm:text-3xl">Курсы</h1>
-        <p className="text-muted">Выберите курс по теме и уровню.</p>
+    <div className="space-y-10">
+      <header className="space-y-3">
+        <h1 className="text-[2.5rem] font-bold leading-tight text-ink">Курсы</h1>
+        <p className="text-[1.0625rem] text-muted">Выберите курс по теме и уровню.</p>
       </header>
 
-      <section className="grid gap-3 md:grid-cols-[1fr_200px_200px]" aria-label="Фильтры">
+      <section className="space-y-5" aria-label="Фильтры">
         <div className="relative">
           <svg
-            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
+            className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -158,52 +164,74 @@ export default function CoursesPage() {
             placeholder="Название курса…"
             name="q"
             autoComplete="off"
-            className="input pl-10"
+            className="input pl-11"
             aria-label="Поиск курсов"
           />
         </div>
-        <select
-          value={category}
-          onChange={(e) => {
-            setCategory(e.target.value);
-            setPage(0);
-          }}
-          className="input"
-          aria-label="Категория"
-        >
-          <option value="">Все категории</option>
-          {categories.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
-        <select
-          value={level}
-          onChange={(e) => {
-            setLevel(e.target.value as CourseLevel | "");
-            setPage(0);
-          }}
-          className="input"
+
+        <div role="group" aria-label="Категория" className="flex flex-wrap gap-2">
+          {["", ...categories].map((c) => {
+            const active = category === c;
+            return (
+              <button
+                key={c || "all"}
+                type="button"
+                aria-pressed={active}
+                onClick={() => {
+                  setCategory(c);
+                  setPage(0);
+                }}
+                className={`${CHIP_BASE} ${active ? CHIP_ON : CHIP_OFF}`}
+              >
+                {c || "Все"}
+              </button>
+            );
+          })}
+        </div>
+
+        <div
+          role="group"
           aria-label="Уровень"
+          className="inline-flex max-w-full flex-wrap gap-1 rounded-full bg-surface-2 p-1"
         >
-          <option value="">Все уровни</option>
-          {LEVELS.map((l) => (
-            <option key={l} value={l}>
-              {LEVEL_LABELS[l]}
-            </option>
-          ))}
-        </select>
+          {LEVEL_OPTIONS.map((l) => {
+            const active = level === l;
+            return (
+              <button
+                key={l || "any"}
+                type="button"
+                aria-pressed={active}
+                onClick={() => {
+                  setLevel(l);
+                  setPage(0);
+                }}
+                className={`min-h-11 rounded-full px-4 text-[0.9375rem] font-semibold transition-colors duration-150 ${
+                  active ? "bg-surface text-ink shadow-card" : "text-muted hover:text-ink"
+                }`}
+              >
+                {l === "" ? "Любой" : LEVEL_LABELS[l]}
+              </button>
+            );
+          })}
+        </div>
       </section>
 
       {actionError && <ErrorBox message={actionError} />}
 
+      <p className="text-[0.9375rem] text-muted" aria-live="polite">
+        {!loading && !error && result && (
+          <>
+            Найдено курсов: <span className="font-semibold text-ink tabular-nums">{result.total}</span>
+          </>
+        )}
+      </p>
+
       {loading && (
-        <div className="space-y-5" aria-busy="true" aria-live="polite">
+        <div aria-busy="true">
           <span className="sr-only">Загружаем курсы</span>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }, (_, i) => (
-              <Skeleton key={i} className="h-72" />
+              <Skeleton key={i} className="h-80" />
             ))}
           </div>
         </div>
@@ -212,38 +240,35 @@ export default function CoursesPage() {
       {!loading && error && <ErrorBox message={error} onRetry={() => setReloadKey((k) => k + 1)} />}
 
       {!loading && !error && result && result.items.length === 0 && (
-        <div className="card py-12 text-center text-sm text-muted">
+        <div className="rounded-xl border border-dashed border-line bg-surface px-6 py-12 text-center text-[0.9375rem] text-muted">
           Курсов не найдено. Измените запрос или фильтры.
         </div>
       )}
 
       {!loading && !error && result && result.items.length > 0 && (
         <>
-          <p className="text-sm text-muted" aria-live="polite">
-            Найдено курсов: <span className="tabular-nums">{result.total}</span>
-          </p>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {result.items.map((course) => (
               <CourseCard key={course.id} course={course} action={renderAction(course)} />
             ))}
           </div>
 
           {totalPages > 1 && (
-            <nav className="flex items-center justify-between gap-4 pt-2" aria-label="Пагинация">
+            <nav className="flex items-center justify-between gap-4" aria-label="Пагинация">
               <button
                 type="button"
-                className="btn-secondary !py-2"
+                className="btn-secondary"
                 disabled={page === 0}
                 onClick={() => setPage((p) => Math.max(0, p - 1))}
               >
                 Назад
               </button>
-              <span className="text-sm text-muted">
+              <span className="text-[0.9375rem] text-muted">
                 Страница {page + 1} из {totalPages}
               </span>
               <button
                 type="button"
-                className="btn-secondary !py-2"
+                className="btn-secondary"
                 disabled={page + 1 >= totalPages}
                 onClick={() => setPage((p) => p + 1)}
               >

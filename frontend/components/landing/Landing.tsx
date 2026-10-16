@@ -239,15 +239,16 @@ export default function Landing() {
           <p className="lp-sec-lead" data-reveal>
             Скриншоты сделаны на демо-стенде. Урок, тест и наставник открываются на одной странице.
           </p>
-          <div className="lp-grid-2">
+          <div className="lp-shots">
             <figure className="lp-shot" data-reveal>
               <div className="lp-shot-frame">
                 <Image
                   src="/landing/app-lesson.jpg"
+                  unoptimized
                   alt="Страница урока: текст про SELECT слева и тест из трёх вопросов справа"
                   width={1280}
-                  height={1000}
-                  sizes="(max-width: 700px) 100vw, 540px"
+                  height={900}
+                  sizes="(max-width: 700px) 100vw, 840px"
                 />
               </div>
               <figcaption>Текст урока и тест рядом.</figcaption>
@@ -256,10 +257,11 @@ export default function Landing() {
               <div className="lp-shot-frame">
                 <Image
                   src="/landing/app-tutor.jpg"
+                  unoptimized
                   alt="Панель ИИ-наставника с разбором ошибки в тесте по SQL"
-                  width={1280}
-                  height={1000}
-                  sizes="(max-width: 700px) 100vw, 540px"
+                  width={384}
+                  height={900}
+                  sizes="(max-width: 700px) 100vw, 260px"
                 />
               </div>
               <figcaption>Наставник объясняет ошибку и отвечает на вопросы по уроку.</figcaption>
@@ -275,21 +277,21 @@ export default function Landing() {
             Он видит, какой вариант вы выбрали и какой был верным, и объясняет разницу.
           </p>
           <div className="lp-grid-3">
-            <div className="lp-card lp-step" data-reveal>
+            <div className="lp-card lp-step lp-tone-sun" data-reveal>
               <h3 className="lp-step-title">Вы отвечаете на вопрос</h3>
               <p className="lp-call">Ваш ответ: int</p>
               <p className="lp-response" data-ui>
                 Неверно. Правильный ответ: float.
               </p>
             </div>
-            <div className="lp-card lp-step" data-reveal style={vi(1)}>
+            <div className="lp-card lp-step lp-tone-sky" data-reveal style={vi(1)}>
               <h3 className="lp-step-title">Наставник объясняет</h3>
               <p className="lp-call">Почему не int?</p>
               <p className="lp-response" data-ui>
                 int хранит только целые числа. У 3.14 есть дробная часть, поэтому это float.
               </p>
             </div>
-            <div className="lp-card lp-step" data-reveal style={vi(2)}>
+            <div className="lp-card lp-step lp-tone-coral" data-reveal style={vi(2)}>
               <h3 className="lp-step-title">Вы проходите тест заново</h3>
               <p className="lp-call">Попытка 2: 2 из 2 верно</p>
               <p className="lp-response" data-ui>

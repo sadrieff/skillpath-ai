@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import { LEVEL_LABELS } from "@/components/CourseCard";
 import ErrorBox from "@/components/ErrorBox";
 import Spinner from "@/components/Spinner";
-import StatCard from "@/components/StatCard";
 import {
   adminCreateCourse,
   adminDeleteCourse,
@@ -13,9 +12,10 @@ import {
   adminUpdateCourse,
   errorMessage,
 } from "@/lib/api";
+import { courseTheme } from "@/lib/courseTheme";
 import type { AdminCourse, AdminStats, CourseInput } from "@/lib/types";
 import CourseForm from "./CourseForm";
-import { SectionTitle } from "./ui";
+import { dangerButton, SectionTitle } from "./ui";
 
 type Editor = { mode: "create" } | { mode: "edit"; course: AdminCourse } | null;
 
@@ -72,21 +72,32 @@ export default function AdminCourses() {
     }
   }
 
+  const statItems = stats
+    ? [
+        { label: "Пользователи", value: stats.users },
+        { label: "Курсы", value: stats.courses },
+        { label: "Уроки", value: stats.lessons },
+        { label: "Записи на курсы", value: stats.enrollments },
+        { label: "Попытки тестов", value: stats.attempts },
+      ]
+    : [];
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       {error && <ErrorBox message={error} onRetry={load} />}
 
       {stats && (
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-          <StatCard label="Пользователи" value={stats.users} />
-          <StatCard label="Курсы" value={stats.courses} />
-          <StatCard label="Уроки" value={stats.lessons} />
-          <StatCard label="Записи на курсы" value={stats.enrollments} />
-          <StatCard label="Попытки тестов" value={stats.attempts} />
+        <div className="grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-5">
+          {statItems.map((item) => (
+            <div key={item.label}>
+              <p className="text-[2rem] font-extrabold leading-none text-ink">{item.value}</p>
+              <p className="mt-2 text-sm text-muted">{item.label}</p>
+            </div>
+          ))}
         </div>
       )}
 
-      <section className="space-y-5">
+      <section className="space-y-6">
         <SectionTitle
           actions={
             editor?.mode === "create" ? null : (
@@ -113,48 +124,95 @@ export default function AdminCourses() {
         {loading && !stats && <Spinner label="Загружаем курсы…" />}
 
         {!loading && courses.length === 0 && !error && (
-          <div className="card text-sm text-muted">Курсов пока нет. Создайте первый курс.</div>
+          <div className="card text-base text-muted">Курсов пока нет. Создайте первый курс.</div>
         )}
 
         {courses.length > 0 && (
-          <ul className="grid gap-4 md:grid-cols-2">
-            {courses.map((course) => (
-              <li key={course.id} className="card flex flex-col gap-4">
-                <div className="space-y-2">
-                  <div className="flex flex-wrap items-center gap-2 text-xs">
-                    <span className="rounded bg-accent/15 px-2.5 py-1 font-medium text-accent">
+          <table className="w-full text-left">
+            <caption className="sr-only">Список курсов</caption>
+            <thead className="sr-only md:not-sr-only">
+              <tr className="border-b border-line text-sm text-muted">
+                <th scope="col" className="py-3 pr-4 font-semibold">
+                  Курс
+                </th>
+                <th scope="col" className="py-3 pr-4 font-semibold">
+                  Категория
+                </th>
+                <th scope="col" className="py-3 pr-4 font-semibold">
+                  Уровень
+                </th>
+                <th scope="col" className="py-3 pr-4 font-semibold">
+                  Часы
+                </th>
+                <th scope="col" className="py-3 font-semibold">
+                  <span className="sr-only">Действия</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody className="flex flex-col gap-3 md:table-row-group md:gap-0">
+              {courses.map((course) => {
+                const theme = courseTheme(course.category, course.id);
+                const deleting = deletingId === course.id;
+                return (
+                  <tr
+                    key={course.id}
+                    className="flex flex-col gap-3 rounded-xl border border-line bg-surface p-4 shadow-card md:table-row md:rounded-none md:border-0 md:bg-transparent md:p-0 md:shadow-none"
+                  >
+                    <th scope="row" className="text-left font-normal md:border-b md:border-line md:py-4 md:pr-4">
+                      <span className="flex items-start gap-3">
+                        <span
+                          aria-hidden="true"
+                          className="mt-1.5 h-3.5 w-3.5 shrink-0 rounded-full"
+                          style={{ background: theme.bg, boxShadow: `inset 0 0 0 2px ${theme.fg}` }}
+                        />
+                        <span className="min-w-0">
+                          <span className="block font-semibold leading-snug text-ink">{course.title}</span>
+                          {course.description && (
+                            <span className="mt-1 line-clamp-2 block text-sm text-muted">
+                              {course.description}
+                            </span>
+                          )}
+                        </span>
+                      </span>
+                    </th>
+                    <td className="text-sm text-ink md:border-b md:border-line md:py-4 md:pr-4">
+                      <span className="text-muted md:hidden">Категория: </span>
                       {course.category}
-                    </span>
-                    <span className="text-muted">{LEVEL_LABELS[course.level] ?? course.level}</span>
-                    <span className="text-muted">· {course.duration_hours} ч</span>
-                  </div>
-                  <h3 className="font-semibold leading-snug text-ink">{course.title}</h3>
-                  {course.description && (
-                    <p className="line-clamp-2 text-sm text-muted">{course.description}</p>
-                  )}
-                </div>
-                <div className="mt-auto flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setEditor({ mode: "edit", course })}
-                    className="btn-secondary !py-2"
-                    aria-label={`Редактировать курс «${course.title}»`}
-                  >
-                    Редактировать
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => removeCourse(course)}
-                    disabled={deletingId === course.id}
-                    className="inline-flex min-h-11 items-center justify-center rounded border border-danger/40 bg-danger/10 px-5 py-2 text-sm font-semibold text-danger transition hover:bg-danger/20 disabled:opacity-60"
-                    aria-label={`Удалить курс «${course.title}»`}
-                  >
-                    {deletingId === course.id ? "Удаляем…" : "Удалить"}
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
+                    </td>
+                    <td className="text-sm text-ink md:border-b md:border-line md:py-4 md:pr-4">
+                      <span className="text-muted md:hidden">Уровень: </span>
+                      {LEVEL_LABELS[course.level] ?? course.level}
+                    </td>
+                    <td className="text-sm text-ink md:border-b md:border-line md:py-4 md:pr-4">
+                      <span className="text-muted md:hidden">Часы: </span>
+                      {course.duration_hours} ч
+                    </td>
+                    <td className="md:whitespace-nowrap md:border-b md:border-line md:py-4 md:text-right">
+                      <div className="flex flex-wrap gap-2 md:flex-nowrap md:justify-end">
+                        <button
+                          type="button"
+                          onClick={() => setEditor({ mode: "edit", course })}
+                          className="btn-secondary"
+                          aria-label={`Редактировать курс «${course.title}»`}
+                        >
+                          Редактировать
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeCourse(course)}
+                          disabled={deleting}
+                          className={dangerButton}
+                          aria-label={`Удалить курс «${course.title}»`}
+                        >
+                          {deleting ? "Удаляем…" : "Удалить"}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         )}
       </section>
     </div>

@@ -116,72 +116,82 @@ function LessonContent({ lessonId }: { lessonId: number }) {
   const youtubeSrc = lesson.video_url ? youtubeEmbedUrl(lesson.video_url) : null;
   const videoLink = lesson.video_url && !youtubeSrc ? safeHttpUrl(lesson.video_url) : null;
   const materialLink = lesson.material_url ? materialHref(lesson.material_url) : null;
+  // Lesson number counts across the whole course, module by module.
+  const lessonIndex = course?.modules.flatMap((m) => m.lessons).findIndex((item) => item.id === lesson.id) ?? -1;
 
   return (
     <div className="space-y-8">
       <nav aria-label="Навигация по разделам">
-        <ol className="flex flex-wrap items-center gap-2 text-sm text-muted">
+        <ol className="flex flex-wrap items-center text-sm text-muted">
           <li>
-            <Link href="/courses" className="hover:text-ink">
+            <Link href="/courses" className="inline-flex min-h-11 items-center hover:text-ink">
               Курсы
             </Link>
           </li>
-          <li aria-hidden="true">/</li>
+          <li aria-hidden="true" className="px-1">
+            /
+          </li>
           <li>
-            <Link href={`/courses/${lesson.course_id}`} className="hover:text-ink">
+            <Link href={`/courses/${lesson.course_id}`} className="inline-flex min-h-11 items-center hover:text-ink">
               {course?.title ?? "Курс"}
             </Link>
           </li>
-          <li aria-hidden="true">/</li>
-          <li className="truncate text-ink" aria-current="page">
+          <li aria-hidden="true" className="px-1">
+            /
+          </li>
+          <li className="inline-flex min-h-11 max-w-full items-center truncate text-ink" aria-current="page">
             {lesson.title}
           </li>
         </ol>
       </nav>
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,720px)_360px] lg:justify-between">
         <div className="min-w-0 space-y-8">
           <header className="space-y-4">
-            <div className="flex flex-wrap items-center gap-2 text-xs">
+            <div className="flex flex-wrap items-center gap-2">
+              {lessonIndex >= 0 && <span className="chip">Урок {lessonIndex + 1}</span>}
               {lesson.completed ? (
-                <span className="rounded bg-success/15 px-2.5 py-1 font-medium text-success">
-                  Урок пройден
-                </span>
+                <span className="chip bg-success/15 text-success">Пройден</span>
               ) : (
-                <span className="rounded bg-surface-2 px-2.5 py-1 text-ink">В процессе</span>
+                <span className="chip">В процессе</span>
               )}
-              {lesson.has_quiz && (
-                <span className="rounded bg-accent/15 px-2.5 py-1 font-medium text-accent">
-                  Есть тест
-                </span>
-              )}
+              {lesson.has_quiz && <span className="chip">Есть тест</span>}
             </div>
-            <h1 className="text-2xl font-bold leading-tight text-ink sm:text-3xl">{lesson.title}</h1>
+            <h1 className="text-[2.5rem] font-extrabold leading-[1.15] text-ink">{lesson.title}</h1>
           </header>
 
           {youtubeSrc && (
-            <div className="overflow-hidden rounded border border-line bg-black aspect-video">
-              <iframe
-                src={youtubeSrc}
-                title={`Видео: ${lesson.title}`}
-                className="h-full w-full"
-                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="strict-origin-when-cross-origin"
-              />
+            <div className="overflow-hidden rounded-xl border border-line bg-surface shadow-card">
+              <div className="aspect-video bg-ink">
+                <iframe
+                  src={youtubeSrc}
+                  title={`Видео: ${lesson.title}`}
+                  className="h-full w-full"
+                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                />
+              </div>
+              <p className="px-5 py-3 text-sm font-semibold text-ink">Видео к уроку</p>
             </div>
           )}
 
           {videoLink && (
-            <a
-              href={videoLink.toString()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-secondary w-full sm:w-auto"
-            >
-              Смотреть видео
-            </a>
+            <div className="card flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="font-semibold text-ink">Видео к уроку</p>
+                <p className="text-sm text-muted">Откроется на другом сайте</p>
+              </div>
+              <a
+                href={videoLink.toString()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-secondary w-full sm:w-auto"
+              >
+                Смотреть видео
+              </a>
+            </div>
           )}
 
           {lesson.content.trim() ? (
@@ -198,68 +208,83 @@ function LessonContent({ lessonId }: { lessonId: number }) {
               download
               target="_blank"
               rel="noopener noreferrer"
-              className="card flex items-center gap-3 transition-colors duration-150 hover:border-accent"
+              className="card flex items-center gap-4 transition-[border-color,box-shadow] duration-150 hover:border-ink hover:shadow-lift"
             >
               <span
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-accent/15 text-accent"
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent/15 text-accent"
                 aria-hidden="true"
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14" />
                 </svg>
               </span>
-              <span className="text-sm">
-                <span className="block font-medium text-ink">Материал к уроку</span>
-                <span className="text-muted">Скачать файл</span>
+              <span className="min-w-0">
+                <span className="block font-semibold text-ink">Материал к уроку</span>
+                <span className="block text-sm text-muted">Скачать файл</span>
               </span>
             </a>
           )}
 
-          <section className="card space-y-4" aria-labelledby="progress-title">
+          <section className="space-y-6 border-t border-line pt-8" aria-labelledby="progress-title">
             <h2 id="progress-title" className="sr-only">
               Прогресс
             </h2>
             {courseProgress !== null && <ProgressBar value={courseProgress} label="Прогресс курса" />}
             {completeError && <ErrorBox message={completeError} />}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              {lesson.completed ? (
-                <p className="text-sm font-medium text-success">Урок отмечен как пройденный.</p>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleComplete}
-                  disabled={completing}
-                  className="btn-primary w-full sm:w-auto"
-                >
-                  {completing ? "Сохраняем…" : "Отметить пройденным"}
-                </button>
-              )}
-            </div>
-          </section>
+            {lesson.completed ? (
+              <p className="flex items-center gap-2 text-base font-semibold text-success">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 12l4 4 10-10" />
+                </svg>
+                Урок отмечен как пройденный.
+              </p>
+            ) : (
+              <button
+                type="button"
+                onClick={handleComplete}
+                disabled={completing}
+                className="btn-primary w-full sm:w-auto"
+              >
+                {completing ? "Сохраняем…" : "Отметить пройденным"}
+              </button>
+            )}
 
-          <nav className="flex flex-col gap-3 sm:flex-row sm:justify-between" aria-label="Соседние уроки">
-            {lesson.prev_lesson_id !== null ? (
-              <Link href={`/lessons/${lesson.prev_lesson_id}`} className="btn-secondary">
-                ← Предыдущий урок
-              </Link>
-            ) : (
-              <span className="btn-secondary pointer-events-none opacity-40" aria-disabled="true">
-                ← Предыдущий урок
-              </span>
-            )}
-            {lesson.next_lesson_id !== null ? (
-              <Link href={`/lessons/${lesson.next_lesson_id}`} className="btn-primary">
-                Следующий урок →
-              </Link>
-            ) : (
-              <span className="btn-primary pointer-events-none opacity-40" aria-disabled="true">
-                Следующий урок →
-              </span>
-            )}
-          </nav>
+            <nav className="grid gap-3 sm:grid-cols-2" aria-label="Соседние уроки">
+              {lesson.prev_lesson_id !== null ? (
+                <Link href={`/lessons/${lesson.prev_lesson_id}`} className="btn-secondary w-full">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 12H5m0 0l6-6m-6 6l6 6" />
+                  </svg>
+                  Предыдущий урок
+                </Link>
+              ) : (
+                <span className="btn-secondary pointer-events-none w-full opacity-40" aria-disabled="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 12H5m0 0l6-6m-6 6l6 6" />
+                  </svg>
+                  Предыдущий урок
+                </span>
+              )}
+              {lesson.next_lesson_id !== null ? (
+                <Link href={`/lessons/${lesson.next_lesson_id}`} className="btn-primary w-full">
+                  Следующий урок
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14m0 0l-6-6m6 6l-6 6" />
+                  </svg>
+                </Link>
+              ) : (
+                <span className="btn-primary pointer-events-none w-full opacity-40" aria-disabled="true">
+                  Следующий урок
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14m0 0l-6-6m6 6l-6 6" />
+                  </svg>
+                </span>
+              )}
+            </nav>
+          </section>
         </div>
 
-        <aside className="min-w-0 space-y-6" aria-label="Тест и ИИ-наставник">
+        <aside className="min-w-0 space-y-6 lg:sticky lg:top-24 lg:self-start" aria-label="Тест и ИИ-наставник">
           {lesson.has_quiz && (
             <Quiz
               lessonId={lesson.id}

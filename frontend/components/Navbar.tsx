@@ -10,6 +10,14 @@ interface NavItem {
   label: string;
 }
 
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  const first = parts[0][0];
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+  return (first + last).toUpperCase();
+}
+
 export default function Navbar() {
   const { user, loading, logout } = useAuth();
   const pathname = usePathname();
@@ -24,17 +32,24 @@ export default function Navbar() {
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   const linkClass = (href: string) =>
-    `inline-flex min-h-11 items-center rounded px-3 text-sm font-medium transition-colors duration-150 ${
-      isActive(href) ? "bg-surface-2 text-ink" : "text-muted hover:bg-surface-2 hover:text-ink"
+    `inline-flex min-h-11 items-center rounded px-3 text-[0.9375rem] font-medium transition-colors duration-150 ${
+      isActive(href) ? "font-semibold text-ink" : "text-muted hover:text-ink"
     }`;
 
+  const label = (item: NavItem) =>
+    isActive(item.href) ? (
+      <span className="underline decoration-accent decoration-[3px] underline-offset-[10px]">{item.label}</span>
+    ) : (
+      item.label
+    );
+
+  const userName = user ? user.full_name || user.email : "";
+
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-ground">
+    <header className="sticky top-0 z-40 border-b border-line bg-surface">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2.5 font-semibold text-ink">
-          <span className="flex h-8 w-8 items-center justify-center rounded bg-accent text-sm font-bold text-accent-ink">
-            SP
-          </span>
+        <Link href="/" className="flex items-center gap-2.5 text-lg font-bold tracking-tight text-ink">
+          <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-accent" />
           <span>SkillPath AI</span>
         </Link>
 
@@ -46,15 +61,28 @@ export default function Navbar() {
               className={linkClass(item.href)}
               aria-current={isActive(item.href) ? "page" : undefined}
             >
-              {item.label}
+              {label(item)}
             </Link>
           ))}
           {/* Reserve the slot while auth loads, so the bar does not jump. */}
-          <div className="ml-2 flex min-h-11 min-w-[104px] items-center justify-end">
+          <div className="ml-3 flex min-h-11 min-w-[120px] items-center justify-end gap-2 border-l border-line pl-4">
             {!loading && user && (
-              <button type="button" onClick={logout} className="btn-secondary !py-2">
-                Выйти
-              </button>
+              <>
+                <span
+                  role="img"
+                  aria-label={`Вы вошли как ${userName}`}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-2 text-sm font-bold text-ink"
+                >
+                  {initials(userName)}
+                </span>
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="inline-flex min-h-11 items-center rounded px-3 text-[0.9375rem] font-medium text-muted transition-colors duration-150 hover:text-ink"
+                >
+                  Выйти
+                </button>
+              </>
             )}
             {!loading && !user && (
               <Link href="/" className="btn-primary !py-2">
@@ -66,7 +94,7 @@ export default function Navbar() {
 
         <button
           type="button"
-          className="flex h-11 w-11 items-center justify-center rounded border border-line text-ink md:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded border border-line bg-surface text-ink md:hidden"
           aria-label={open ? "Закрыть меню" : "Открыть меню"}
           aria-expanded={open}
           aria-controls="mobile-menu"
@@ -83,7 +111,7 @@ export default function Navbar() {
       </div>
 
       {open && (
-        <nav id="mobile-menu" className="border-t border-line px-4 py-3 md:hidden" aria-label="Мобильное меню">
+        <nav id="mobile-menu" className="border-t border-line bg-surface px-4 py-3 md:hidden" aria-label="Мобильное меню">
           <div className="flex flex-col gap-1">
             {items.map((item) => (
               <Link
@@ -93,7 +121,7 @@ export default function Navbar() {
                 className={linkClass(item.href)}
                 aria-current={isActive(item.href) ? "page" : undefined}
               >
-                {item.label}
+                {label(item)}
               </Link>
             ))}
             {!loading && user && (
@@ -103,13 +131,13 @@ export default function Navbar() {
                   setOpen(false);
                   logout();
                 }}
-                className="inline-flex min-h-11 items-center rounded px-3 text-left text-sm font-medium text-muted hover:bg-surface-2 hover:text-ink"
+                className="inline-flex min-h-11 items-center rounded px-3 text-left text-[0.9375rem] font-medium text-muted transition-colors duration-150 hover:text-ink"
               >
                 Выйти
               </button>
             )}
             {!loading && !user && (
-              <Link href="/" onClick={() => setOpen(false)} className={linkClass("/")}>
+              <Link href="/" onClick={() => setOpen(false)} className="btn-primary mt-1">
                 Войти
               </Link>
             )}

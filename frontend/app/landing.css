@@ -1,17 +1,20 @@
 /* Лендинг. Все правила под .lp-root, остальное приложение их не видит. */
 
 .lp-root {
-  --ground: #0b1020;
-  --surface: #1a2350;
-  --surface-2: #2a3874;
-  --line: #3b4a8a;
-  --ink: #f2f5ff;
-  --muted: #aab3d6;
-  --accent: #c8f169;
-  --accent-ink: #0b1020;
-  --danger: #ff8a8a;
+  --ground: #f4f1ea;
+  --surface: #ffffff;
+  --surface-2: #ece8de;
+  --line: #ddd8ca;
+  --ink: #1a1a2e;
+  --muted: #5f6277;
+  --accent: #d63a12;
+  --accent-ink: #ffffff;
+  --accent-text: #b8300c;
+  --danger: #c62828;
+  --success: #1e7a46;
 
-  --radius: 6px;
+  --radius: 12px;
+  --radius-card: 16px;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 
   position: relative;
@@ -67,15 +70,15 @@
 
 .lp-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
   gap: clamp(32px, 5vw, 64px);
-  align-items: center;
+  align-items: start;
   padding: clamp(32px, 6vw, 72px) 0 clamp(56px, 8vw, 104px);
 }
 
 .lp-statement {
   margin: 0;
-  font-size: clamp(2.5rem, 5.6vw, 4.5rem);
+  font-size: clamp(2.5rem, 1rem + 3.9vw, 4.5rem);
   font-weight: 800;
   line-height: 1.02;
   letter-spacing: -0.03em;
@@ -115,11 +118,11 @@
 .lp-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .lp-btn-primary { background: var(--accent); color: var(--accent-ink); }
-.lp-btn-quiet { background: var(--surface-2); color: var(--ink); }
+.lp-btn-quiet { background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
 
 @media (hover: hover) and (pointer: fine) {
-  .lp-btn-primary:hover { background: #d7f78f; }
-  .lp-btn-quiet:hover { background: #36468a; }
+  .lp-btn-primary:hover { background: #b8300c; }
+  .lp-btn-quiet:hover { background: var(--surface-2); }
   .lp-textbtn:hover { text-decoration-color: currentColor; }
 }
 
@@ -137,7 +140,7 @@
   padding: 0;
   border: 0;
   background: none;
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 1rem;
   text-decoration: underline;
   text-decoration-thickness: 0.07em;
@@ -151,7 +154,7 @@
 .lp-typing-input:focus-visible,
 .lp-input:focus-visible,
 .lp-quiz-option:has(input:focus-visible) {
-  outline: 3px solid var(--accent);
+  outline: 3px solid var(--ink);
   outline-offset: 3px;
 }
 
@@ -161,7 +164,7 @@
   padding: 10px 14px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: var(--ground);
+  background: var(--surface);
   color: var(--ink);
   font: inherit;
 }
@@ -175,7 +178,7 @@
   margin-top: 24px;
   padding: 16px;
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: var(--radius-card);
   background: var(--surface);
 }
 
@@ -191,7 +194,7 @@
 .lp-card {
   padding: clamp(20px, 2.6vw, 28px);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: var(--radius-card);
   background: var(--surface);
 }
 
@@ -199,9 +202,9 @@
 
 .lp-quiz {
   padding: clamp(20px, 2.8vw, 32px);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: var(--radius-card);
   background: var(--surface);
+  box-shadow: 0 1px 2px rgba(26, 26, 46, 0.05), 0 8px 24px -12px rgba(26, 26, 46, 0.14);
 }
 
 .lp-quiz-title {
@@ -236,15 +239,15 @@
 }
 
 .lp-quiz-option:active { transform: scale(0.98); }
-.lp-quiz-option:has(input:checked) { background: var(--ink); color: var(--ground); }
+.lp-quiz-option:has(input:checked) { background: var(--ink); color: var(--surface); }
 
 .lp-quiz-option input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
 
 .lp-quiz-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
 
-.lp-quiz-feedback { min-height: 10.5em; margin-top: 16px; }
+.lp-quiz-feedback { min-height: 8em; margin-top: 16px; }
 
-.lp-fb-verdict { margin: 0 0 6px; font-weight: 700; color: var(--accent); }
+.lp-fb-verdict { margin: 0 0 6px; font-weight: 700; color: var(--success); }
 .lp-fb-bad .lp-fb-verdict { color: var(--danger); }
 .lp-fb p { margin: 0; }
 
@@ -252,11 +255,12 @@
   margin-top: 10px;
   padding: 14px 16px;
   border-radius: var(--radius);
-  background: var(--surface-2);
+  background: #ffe38a;
+  color: var(--ink);
 }
 
-.lp-tutor-label { font-weight: 700; color: var(--accent); }
-.lp-tutor-note { margin-top: 6px !important; color: var(--muted); font-size: 0.875rem; }
+.lp-tutor-label { font-weight: 700; color: #6b4f00; }
+.lp-tutor-note { margin-top: 6px !important; color: #6b4f00; font-size: 0.875rem; }
 
 /* ---------- Секции ---------- */
 
@@ -281,22 +285,24 @@
 .lp-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 .lp-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
 
-/* Скриншоты приложения */
+/* Скриншоты приложения: широкий урок и узкая панель наставника одной высоты */
+.lp-shots { display: grid; grid-template-columns: minmax(0, 3.33fr) minmax(0, 1fr); gap: 20px; align-items: start; }
 
 .lp-shot { margin: 0; }
 
 .lp-shot-frame {
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: var(--radius-card);
   background: var(--surface);
+  box-shadow: 0 1px 2px rgba(26, 26, 46, 0.05), 0 8px 24px -12px rgba(26, 26, 46, 0.14);
 }
 
 .lp-shot-frame img { display: block; width: 100%; height: auto; }
 
 .lp-shot figcaption { margin-top: 12px; color: var(--muted); font-size: 0.9375rem; }
 
-/* Три шага разбора ошибки */
+/* Три шага разбора ошибки: каждый на фоне своего курса */
 
 .lp-step { display: flex; flex-direction: column; gap: 12px; }
 .lp-step-title { margin: 0; font-size: 1.1875rem; font-weight: 700; line-height: 1.25; }
@@ -305,17 +311,28 @@
   margin: 0;
   padding: 12px 14px;
   border-radius: var(--radius);
-  background: var(--surface-2);
+  background: var(--surface);
+  color: var(--ink);
   font-weight: 500;
 }
 
-.lp-response { margin: 0; color: var(--ink); }
+.lp-response { margin: 0; }
 
-/* Что внутри */
+.lp-tone-sun { border-color: transparent; background: #ffe38a; color: #6b4f00; }
+.lp-tone-sky { border-color: transparent; background: #bfd8ff; color: #1b4590; }
+.lp-tone-coral { border-color: transparent; background: #ffc9b8; color: #8e2f10; }
 
-.lp-feature { display: flex; flex-direction: column; gap: 6px; }
+/* Что внутри: шесть карточек по кругу */
+
+.lp-feature { display: flex; flex-direction: column; gap: 6px; border-color: transparent; color: var(--ink); }
+.lp-feature:nth-child(6n + 1) { background: #ffe38a; }
+.lp-feature:nth-child(6n + 2) { background: #bfd8ff; }
+.lp-feature:nth-child(6n + 3) { background: #ffc9b8; }
+.lp-feature:nth-child(6n + 4) { background: #c6ebcb; }
+.lp-feature:nth-child(6n + 5) { background: #f6cbe5; }
+.lp-feature:nth-child(6n + 6) { background: #d9d2f7; }
 .lp-feature-name { margin: 0; font-size: 1.1875rem; font-weight: 700; }
-.lp-feature-value { margin: 0; color: var(--muted); }
+.lp-feature-value { margin: 0; color: #3a3d52; }
 
 /* Поиск по каталогу */
 
@@ -326,7 +343,7 @@
   padding: 14px 18px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: var(--ground);
+  background: var(--surface);
   color: var(--ink);
   font: inherit;
   font-size: clamp(1.25rem, 1rem + 1.2vw, 1.75rem);
@@ -356,13 +373,16 @@
   justify-content: space-between;
   gap: 24px 40px;
   padding: clamp(28px, 4vw, 48px);
-  border: 1px solid var(--accent);
-  border-radius: var(--radius);
-  background: var(--surface);
+  border-radius: var(--radius-card);
+  background: var(--ink);
+  color: #ffffff;
 }
 
-.lp-cta .lp-h2 { margin-bottom: 8px; }
-.lp-cta p { margin: 0; color: var(--muted); max-width: 44ch; }
+.lp-cta :focus-visible { outline-color: #ffffff; }
+.lp-cta .lp-h2 { margin-bottom: 8px; color: #ffffff; }
+.lp-cta p { margin: 0; color: #e4e4ea; max-width: 44ch; }
+.lp-cta .lp-action-note { color: #e4e4ea; }
+.lp-cta .lp-error { color: #ffb4b4; }
 
 .lp-footer {
   display: flex;
@@ -409,5 +429,7 @@
 
 @media (max-width: 700px) {
   .lp-grid-2 { grid-template-columns: minmax(0, 1fr); }
-  .lp-quiz-feedback { min-height: 12em; }
+  .lp-shots { grid-template-columns: minmax(0, 1fr); }
+  .lp-shots .lp-shot:last-child { max-width: 320px; }
+  .lp-quiz-feedback { min-height: 9em; }
 }
