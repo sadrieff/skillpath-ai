@@ -106,3 +106,27 @@ bash /opt/skillpath-ai/deploy/update.sh
 - Не оставлять пароли и `JWT_SECRET` из шаблона (`CHANGE_ME`).
 - Не запускать `down -v` без необходимости: это удаляет базу.
 - Не загружать на стенд реальные персональные данные: он публичный и демонстрационный.
+
+## Стенд на общей ноде (https://demo.ciferkaservice.online:8443)
+
+Так стенд запущен на самом деле. На ноде уже работают чужие сервисы, и 80 с 443 занимает Xray, поэтому схема другая:
+
+- Образы `skillpath-api` и `skillpath-web` собирает GitHub Actions (`.github/workflows/demo-images.yml`) и кладёт в `ghcr.io`. Пакеты публичные. На ноде ничего не собирается.
+- `deploy/docker-compose.node.yml`: db, api, web и свой Caddy на порту 8443. У каждого контейнера лимит памяти и процессора, чтобы стенд не мешал соседям. Сейчас он занимает около 135 МБ.
+- Адрес фронта вшит в образ при сборке (`DEMO_URL` в workflow), поэтому при смене домена или порта образы нужно пересобрать.
+- Автоматический HTTPS Caddy не работает на нестандартном порту, поэтому сертификат выпущен отдельно (`certbot`, проверка по DNS, запись `_acme-challenge.demo` на reg.ru) и лежит в `deploy/certs/` на ноде. Каталог в `.gitignore`.
+- Данные сбрасываются ночью cron-ом: `deploy/reset-demo.sh` с `COMPOSE_FILE=deploy/docker-compose.node.yml`.
+
+Обновление после нового коммита: дождаться зелёного `Demo images` в GitHub Actions, затем на ноде `bash ~/skillpath-demo/deploy/update-node.sh`.
+
+### Продление сертификата
+
+Сертификат Let's Encrypt действует 90 дней, автопродления нет. Продлевать за неделю-две до срока (первый истекает 2027-01-14):
+
+1. На машине с certbot: `certbot certonly --manual --preferred-challenges dns -d demo.ciferkaservice.online`.
+2. Certbot покажет значение TXT. Заменить на reg.ru запись `_acme-challenge.demo` и подтвердить.
+3. Скопировать `fullchain.pem` и `privkey.pem` в `~/skillpath-demo/deploy/certs/` на ноде и выполнить `docker compose -f deploy/docker-compose.node.yml --env-file deploy/demo.env restart caddy`.
+
+### Что делать, если стенд лёг
+
+`docker compose -f deploy/docker-compose.node.yml --env-file deploy/demo.env ps` и `logs --tail 50 api`. Остановить полностью: `down` (данные базы сохранятся, `down -v` их удаляет).

@@ -5,7 +5,7 @@
 set -euo pipefail
 
 APP_DIR="${APP_DIR:-/opt/skillpath-ai}"
-COMPOSE_FILE="deploy/docker-compose.demo.yml"
+COMPOSE_FILE="${COMPOSE_FILE:-deploy/docker-compose.demo.yml}"
 ENV_FILE="deploy/demo.env"
 
 echo "$(date -Is) demo reset: start"
