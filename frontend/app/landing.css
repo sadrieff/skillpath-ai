@@ -2,8 +2,8 @@
 
 .lp-root {
   --ground: #0b1020;
-  --surface: #121936;
-  --surface-2: #1a2347;
+  --surface: #1a2350;
+  --surface-2: #2a3874;
   --ink: #f2f5ff;
   --muted: #aab3d6;
   --accent: #c8f169;
@@ -134,7 +134,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .lp-btn-primary:hover { background: #d7f78f; }
-  .lp-btn-quiet:hover { background: #242f5c; }
+  .lp-btn-quiet:hover { background: #36468a; }
   .lp-link:hover { text-decoration-color: currentColor; }
   .lp-textbtn:hover { text-decoration-color: currentColor; }
 }

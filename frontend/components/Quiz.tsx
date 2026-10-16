@@ -5,6 +5,7 @@ import ErrorBox from "@/components/ErrorBox";
 import Spinner from "@/components/Spinner";
 import { ApiError, errorMessage, getQuiz, submitAttempt } from "@/lib/api";
 import type { Quiz as QuizData, QuizAttemptResult } from "@/lib/types";
+import InlineCode from "@/components/InlineCode";
 
 /** Score at which the lesson counts as passed (matches the backend rule). */
 const PASS_PERCENT = 70;
@@ -119,7 +120,7 @@ export default function Quiz({ lessonId, onExplainMistake, onAttemptDone }: Quiz
             <fieldset key={question.id} className="space-y-3">
               <legend className="mb-3 text-sm font-medium leading-relaxed text-ink">
                 <span className="mr-1.5 text-accent">{index + 1}.</span>
-                {question.text}
+                <InlineCode text={question.text} />
               </legend>
               <div className="space-y-2">
                 {question.options.map((option, optionIndex) => {
@@ -144,7 +145,7 @@ export default function Quiz({ lessonId, onExplainMistake, onAttemptDone }: Quiz
                         onChange={() => selectOption(question.id, optionIndex)}
                         className="mt-0.5 h-4 w-4 shrink-0 accent-accent"
                       />
-                      <span>{option}</span>
+                      <span><InlineCode text={option} /></span>
                     </label>
                   );
                 })}
@@ -207,7 +208,7 @@ export default function Quiz({ lessonId, onExplainMistake, onAttemptDone }: Quiz
                   </p>
                   <p className="text-xs text-muted">Ваш ответ: {chosen ?? "—"}</p>
                   {!item.correct && <p className="text-xs text-ink">Правильный ответ: {correct ?? "—"}</p>}
-                  {item.explanation && <p className="text-sm text-muted">{item.explanation}</p>}
+                  {item.explanation && <p className="text-sm text-muted"><InlineCode text={item.explanation} /></p>}
                 </li>
               );
             })}

@@ -99,8 +99,8 @@ function ActionGroup({ primary }: { primary: ReactNode }) {
 }
 
 /** Wraps the primary action with the demo buttons only when the demo stand flag is set. */
-function withDemo(primary: ReactNode) {
-  return DEMO_ENABLED ? <ActionGroup primary={primary} /> : primary;
+function withDemo(primary: ReactNode, logged: boolean) {
+  return DEMO_ENABLED && !logged ? <ActionGroup primary={primary} /> : primary;
 }
 
 function DemoLogin() {
@@ -236,7 +236,7 @@ export default function Landing() {
               {DEV_LOGIN_ENABLED && <DemoLogin />}
             </div>
             <div className="lp-hero-action" data-rise style={vi(3)}>
-              {withDemo(<PrimaryAction logged={logged} />)}
+              {withDemo(<PrimaryAction logged={logged} />, logged)}
             </div>
           </div>
 
@@ -367,7 +367,7 @@ export default function Landing() {
               <p className="lp-lead" data-reveal>
                 Войдите через Google и откройте курс «Python для начинающих».
               </p>
-              <div data-reveal>{withDemo(<PrimaryAction logged={logged} />)}</div>
+              <div data-reveal>{withDemo(<PrimaryAction logged={logged} />, logged)}</div>
             </div>
           </section>
 

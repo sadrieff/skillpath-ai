@@ -10,9 +10,9 @@
 :root {
   color-scheme: dark;
   --c-ground: 11 16 32;        /* #0b1020 */
-  --c-surface: 18 25 54;       /* #121936 */
-  --c-surface-2: 26 35 71;     /* #1a2347 */
-  --c-line: 42 52 92;          /* #2a345c */
+  --c-surface: 26 35 80;       /* #1a2350 */
+  --c-surface-2: 42 56 116;    /* #2a3874 */
+  --c-line: 59 74 138;         /* #3b4a8a */
   --c-ink: 242 245 255;        /* #f2f5ff */
   --c-muted: 170 179 214;      /* #aab3d6 */
   --c-accent: 200 241 105;     /* #c8f169 */
