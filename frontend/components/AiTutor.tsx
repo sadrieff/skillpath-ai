@@ -162,8 +162,8 @@ export default function AiTutor({ lessonId, mistakeRequest }: AiTutorProps) {
   return (
     <section id="ai-tutor" className="card flex flex-col gap-5 scroll-mt-24" aria-labelledby="ai-tutor-title">
       <div className="space-y-1">
-        <p className="text-sm font-medium text-muted">ИИ-наставник</p>
-        <h2 id="ai-tutor-title" className="text-xl font-bold text-ink">
+        <p className="kicker">ИИ-наставник</p>
+        <h2 id="ai-tutor-title" className="text-lg font-semibold text-ink">
           Вопрос по теме урока
         </h2>
       </div>
@@ -175,7 +175,7 @@ export default function AiTutor({ lessonId, mistakeRequest }: AiTutorProps) {
             type="button"
             onClick={() => void ask(quick.mode)}
             disabled={busy}
-            className="btn-secondary rounded-full px-4 text-sm"
+            className="chip min-h-11 cursor-pointer hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {quick.label}
           </button>
@@ -184,7 +184,7 @@ export default function AiTutor({ lessonId, mistakeRequest }: AiTutorProps) {
 
       <div
         ref={chatRef}
-        className="flex max-h-[460px] min-h-[160px] flex-col gap-3 overflow-y-auto rounded-xl border border-line bg-surface-2 p-3 sm:p-4"
+        className="flex max-h-[460px] min-h-[160px] flex-col gap-3 overflow-y-auto rounded-xl border border-line bg-surface p-3 sm:p-4"
         role="log"
         aria-live="polite"
         aria-label="История диалога с наставником"
@@ -200,7 +200,7 @@ export default function AiTutor({ lessonId, mistakeRequest }: AiTutorProps) {
           item.role === "user" ? (
             <div key={item.id} className="flex justify-end">
               <div
-                className={`max-w-[85%] whitespace-pre-wrap rounded-2xl bg-ink px-4 py-3 text-[0.9375rem] leading-relaxed text-accent-ink ${
+                className={`max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-br-md bg-ink px-4 py-3 text-[0.9375rem] leading-relaxed text-white ${
                   item.clamp ? "line-clamp-3" : ""
                 }`}
               >
@@ -210,7 +210,7 @@ export default function AiTutor({ lessonId, mistakeRequest }: AiTutorProps) {
             </div>
           ) : item.failed ? (
             <div key={item.id} className="flex justify-start">
-              <div className="flex max-w-[92%] items-start gap-2.5 rounded-2xl border border-danger bg-danger/10 px-4 py-3 text-[0.9375rem] leading-relaxed text-ink">
+              <div className="flex max-w-[92%] items-start gap-2.5 rounded-2xl rounded-bl-md border border-danger/40 bg-danger/5 px-4 py-3 text-[0.9375rem] leading-relaxed text-ink">
                 <svg
                   width="18"
                   height="18"
@@ -228,7 +228,7 @@ export default function AiTutor({ lessonId, mistakeRequest }: AiTutorProps) {
             </div>
           ) : (
             <div key={item.id} className="flex justify-start">
-              <div className="max-w-[92%] rounded-2xl border border-line bg-surface px-4 py-3 text-ink shadow-card">
+              <div className="max-w-[92%] rounded-2xl rounded-bl-md bg-surface-2 px-4 py-3 text-ink">
                 <span className="sr-only">Наставник: </span>
                 <div className="prose-sp !text-sm [&_h1]:!mt-4 [&_h1]:!text-base [&_h2]:!mt-4 [&_h2]:!text-base [&_h3]:!mt-3 [&_h3]:!text-sm">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.text}</ReactMarkdown>
@@ -239,7 +239,7 @@ export default function AiTutor({ lessonId, mistakeRequest }: AiTutorProps) {
         )}
         {busy && (
           <div className="flex justify-start">
-            <div className="rounded-2xl border border-line bg-surface px-4 py-3">
+            <div className="rounded-2xl rounded-bl-md bg-surface-2 px-4 py-3">
               <Spinner label="Наставник думает…" />
             </div>
           </div>
@@ -270,7 +270,7 @@ export default function AiTutor({ lessonId, mistakeRequest }: AiTutorProps) {
         </div>
       </form>
 
-      <p className="text-sm leading-relaxed text-muted">
+      <p className="text-sm text-muted">
         Ответы наставника сгенерированы ИИ автоматически и могут содержать ошибки. Сверяйте важные факты с
         материалами урока.
       </p>

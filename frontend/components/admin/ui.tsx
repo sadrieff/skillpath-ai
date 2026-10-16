@@ -37,7 +37,7 @@ export function ErrorText({ id, children }: { id?: string; children: ReactNode }
 
 /** Красная текстовая кнопка для удаления. */
 export const dangerButton =
-  "inline-flex min-h-11 items-center justify-center rounded-lg px-4 py-2.5 text-[0.9375rem] font-semibold text-danger transition-colors duration-150 hover:bg-danger/10 disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex min-h-11 items-center justify-center rounded-full px-4 py-2.5 text-[0.9375rem] font-semibold text-danger transition-colors duration-150 hover:bg-danger/10 disabled:cursor-not-allowed disabled:opacity-50";
 
 /** Label + control + hint/error, wired together for screen readers. */
 export function Field({ label, error, hint, className, children }: FieldProps) {
@@ -48,7 +48,7 @@ export function Field({ label, error, hint, className, children }: FieldProps) {
 
   return (
     <div className={`space-y-2 ${className ?? ""}`}>
-      <label htmlFor={id} className="block text-sm font-semibold text-ink">
+      <label htmlFor={id} className="block text-sm font-medium text-ink">
         {label}
       </label>
       {children({
@@ -95,7 +95,7 @@ export function parseNonNegativeNumber(value: string): number | null {
 export function SectionTitle({ children, actions }: { children: ReactNode; actions?: ReactNode }) {
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <h2 className="text-[1.75rem] font-bold leading-tight text-ink">{children}</h2>
+      <h2 className="font-serif text-[1.75rem] leading-tight text-ink">{children}</h2>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </div>
   );

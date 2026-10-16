@@ -14,6 +14,12 @@ import type { CourseDetail, Lesson } from "@/lib/types";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
+/** Текст урока часто начинается с того же заголовка, что уже стоит в h1 страницы. */
+function withoutTitle(content: string, title: string): string {
+  const [first, ...rest] = content.trimStart().split("\n");
+  return first.replace(/^#+\s*/, "").trim() === title.trim() ? rest.join("\n") : content;
+}
+
 export default function LessonPage({ params }: { params: { id: string } }) {
   const lessonId = Number(params.id);
   const validId = Number.isInteger(lessonId) && lessonId > 0;
@@ -145,23 +151,31 @@ function LessonContent({ lessonId }: { lessonId: number }) {
         </ol>
       </nav>
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,720px)_360px] lg:justify-between">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,680px)_360px] lg:justify-between lg:gap-12">
         <div className="min-w-0 space-y-8">
           <header className="space-y-4">
-            <div className="flex flex-wrap items-center gap-2">
-              {lessonIndex >= 0 && <span className="chip">Урок {lessonIndex + 1}</span>}
+            <div className="flex flex-wrap items-center gap-3">
+              <p className="kicker">
+                {lessonIndex >= 0 ? `Урок ${lessonIndex + 1}` : "Урок"}
+                {course ? ` · ${course.title}` : ""}
+              </p>
               {lesson.completed ? (
-                <span className="chip bg-success/15 text-success">Пройден</span>
+                <span className="chip gap-1.5 border-accent/40 text-accent">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12l4 4 10-10" />
+                  </svg>
+                  Пройден
+                </span>
               ) : (
                 <span className="chip">В процессе</span>
               )}
               {lesson.has_quiz && <span className="chip">Есть тест</span>}
             </div>
-            <h1 className="text-[2.5rem] font-extrabold leading-[1.15] text-ink">{lesson.title}</h1>
+            <h1 className="font-serif text-4xl font-medium leading-[1.15] text-ink sm:text-[2.75rem]">{lesson.title}</h1>
           </header>
 
           {youtubeSrc && (
-            <div className="overflow-hidden rounded-xl border border-line bg-surface shadow-card">
+            <div className="overflow-hidden rounded-2xl border border-line bg-surface">
               <div className="aspect-video bg-ink">
                 <iframe
                   src={youtubeSrc}
@@ -196,7 +210,7 @@ function LessonContent({ lessonId }: { lessonId: number }) {
 
           {lesson.content.trim() ? (
             <article className="prose-sp">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{lesson.content}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{withoutTitle(lesson.content, lesson.title)}</ReactMarkdown>
             </article>
           ) : (
             <p className="text-sm text-muted">Содержание урока пока не добавлено.</p>
@@ -208,7 +222,7 @@ function LessonContent({ lessonId }: { lessonId: number }) {
               download
               target="_blank"
               rel="noopener noreferrer"
-              className="card flex items-center gap-4 transition-[border-color,box-shadow] duration-150 hover:border-ink hover:shadow-lift"
+              className="card flex items-center gap-4 transition-colors duration-150 hover:border-ink"
             >
               <span
                 className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent/15 text-accent"
@@ -232,11 +246,11 @@ function LessonContent({ lessonId }: { lessonId: number }) {
             {courseProgress !== null && <ProgressBar value={courseProgress} label="Прогресс курса" />}
             {completeError && <ErrorBox message={completeError} />}
             {lesson.completed ? (
-              <p className="flex items-center gap-2 text-base font-semibold text-success">
+              <p className="flex items-center gap-2 text-base font-semibold text-accent">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 12l4 4 10-10" />
                 </svg>
-                Урок отмечен как пройденный.
+                Урок пройден
               </p>
             ) : (
               <button
@@ -252,32 +266,20 @@ function LessonContent({ lessonId }: { lessonId: number }) {
             <nav className="grid gap-3 sm:grid-cols-2" aria-label="Соседние уроки">
               {lesson.prev_lesson_id !== null ? (
                 <Link href={`/lessons/${lesson.prev_lesson_id}`} className="btn-secondary w-full">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 12H5m0 0l6-6m-6 6l6 6" />
-                  </svg>
-                  Предыдущий урок
+                  <span aria-hidden="true">←</span> Предыдущий
                 </Link>
               ) : (
                 <span className="btn-secondary pointer-events-none w-full opacity-40" aria-disabled="true">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 12H5m0 0l6-6m-6 6l6 6" />
-                  </svg>
-                  Предыдущий урок
+                  <span aria-hidden="true">←</span> Предыдущий
                 </span>
               )}
               {lesson.next_lesson_id !== null ? (
-                <Link href={`/lessons/${lesson.next_lesson_id}`} className="btn-primary w-full">
-                  Следующий урок
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14m0 0l-6-6m6 6l-6 6" />
-                  </svg>
+                <Link href={`/lessons/${lesson.next_lesson_id}`} className="btn-secondary w-full">
+                  Следующий <span aria-hidden="true">→</span>
                 </Link>
               ) : (
-                <span className="btn-primary pointer-events-none w-full opacity-40" aria-disabled="true">
-                  Следующий урок
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14m0 0l-6-6m6 6l-6 6" />
-                  </svg>
+                <span className="btn-secondary pointer-events-none w-full opacity-40" aria-disabled="true">
+                  Следующий <span aria-hidden="true">→</span>
                 </span>
               )}
             </nav>

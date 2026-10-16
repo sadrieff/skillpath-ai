@@ -74,7 +74,7 @@ export default function CourseForm({ initial, onSubmit, onCancel }: CourseFormPr
 
   return (
     <form onSubmit={handleSubmit} noValidate className="card space-y-6 sm:p-8" aria-labelledby="course-form-title">
-      <h3 id="course-form-title" className="text-xl font-bold text-ink">
+      <h3 id="course-form-title" className="text-lg font-semibold text-ink">
         {initial ? "Редактирование курса" : "Новый курс"}
       </h3>
 

@@ -1,24 +1,28 @@
-/** Цвет обложки курса. Задан по категории, для остальных выбирается по номеру курса. */
+/** Оформление курса: пастельная подложка обложки и короткий фрагмент кода по теме. */
 export interface CourseTheme {
   /** Фон обложки. */
   bg: string;
-  /** Тёмный оттенок того же цвета: текст и значки на обложке. */
+  /** Тёмный оттенок того же цвета: подписи на обложке. */
   fg: string;
+  /** Строка кода, которая показывается на обложке. */
+  snippet: string;
 }
 
 const BY_CATEGORY: Record<string, CourseTheme> = {
-  python: { bg: "#ffe38a", fg: "#6b4f00" },
-  databases: { bg: "#bfd8ff", fg: "#1b4590" },
-  tools: { bg: "#ffc9b8", fg: "#8e2f10" },
+  python: { bg: "#f7efd2", fg: "#6b5410", snippet: 'print("Привет, мир")' },
+  databases: { bg: "#e1ecf7", fg: "#1f4a7a", snippet: "SELECT name FROM users;" },
+  tools: { bg: "#f9e8dd", fg: "#86411c", snippet: 'git commit -m "init"' },
 };
 
-const FALLBACK: CourseTheme[] = [
-  { bg: "#c6ebcb", fg: "#1b5f2f" },
-  { bg: "#f6cbe5", fg: "#7d255d" },
-  { bg: "#d9d2f7", fg: "#43328f" },
-  { bg: "#ffd9a8", fg: "#7a4300" },
+const FALLBACK: Omit<CourseTheme, "snippet">[] = [
+  { bg: "#e4ede2", fg: "#2f5a2b" },
+  { bg: "#e9e6f5", fg: "#463a86" },
+  { bg: "#f5e3ea", fg: "#7d2f4c" },
 ];
 
-export function courseTheme(category: string, id: number): CourseTheme {
-  return BY_CATEGORY[category.trim().toLowerCase()] ?? FALLBACK[Math.abs(id) % FALLBACK.length];
+export function courseTheme(category: string, id: number, title = ""): CourseTheme {
+  const known = BY_CATEGORY[category.trim().toLowerCase()];
+  if (known) return known;
+  const base = FALLBACK[Math.abs(id) % FALLBACK.length];
+  return { ...base, snippet: title };
 }

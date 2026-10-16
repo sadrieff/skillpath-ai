@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import CourseCard, { LEVEL_LABELS } from "@/components/CourseCard";
 import ErrorBox from "@/components/ErrorBox";
 import Skeleton from "@/components/Skeleton";
-import { enroll, errorMessage, getCourseCategories, getCourses, unenroll } from "@/lib/api";
+import { enroll, errorMessage, getCourseCategories, getCourses } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import type { CourseCard as CourseCardData, CourseLevel, CourseList } from "@/lib/types";
 
@@ -13,10 +13,9 @@ const PAGE_SIZE = 12;
 const LEVELS: CourseLevel[] = ["beginner", "intermediate", "advanced"];
 const LEVEL_OPTIONS: (CourseLevel | "")[] = ["", ...LEVELS];
 
-const CHIP_BASE =
-  "inline-flex min-h-11 items-center rounded-full border px-4 text-[0.9375rem] font-semibold transition-colors duration-150";
-const CHIP_ON = "border-accent bg-accent text-accent-ink";
-const CHIP_OFF = "border-line bg-surface text-ink hover:bg-surface-2";
+const CHIP = "chip min-h-11 px-4 text-[0.9375rem] transition-colors duration-150";
+const CHIP_ON = "border-ink bg-ink text-white hover:bg-ink/85";
+const CHIP_OFF = "hover:bg-surface-2";
 
 export default function CoursesPage() {
   const { user, loading: authLoading } = useAuth();
@@ -73,19 +72,16 @@ export default function CoursesPage() {
     };
   }, [authLoading, userId, q, category, level, page, reloadKey]);
 
-  async function toggleEnroll(course: CourseCardData) {
+  async function enrollCourse(course: CourseCardData) {
     setBusyId(course.id);
     setActionError(null);
     try {
-      if (course.enrolled) await unenroll(course.id);
-      else await enroll(course.id);
+      await enroll(course.id);
       setResult((prev) =>
         prev
           ? {
               ...prev,
-              items: prev.items.map((c) =>
-                c.id === course.id ? { ...c, enrolled: !course.enrolled } : c,
-              ),
+              items: prev.items.map((c) => (c.id === course.id ? { ...c, enrolled: true } : c)),
             }
           : prev,
       );
@@ -107,29 +103,19 @@ export default function CoursesPage() {
         </Link>
       );
     }
-    const busy = busyId === course.id;
     if (course.enrolled) {
       return (
-        <div className="flex gap-2">
-          <Link href={`/courses/${course.id}`} className="btn-primary flex-1">
-            Открыть
-          </Link>
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => toggleEnroll(course)}
-            className="btn-secondary"
-          >
-            {busy ? "Отписываем…" : "Отписаться"}
-          </button>
-        </div>
+        <Link href={`/courses/${course.id}`} className="btn-secondary w-full">
+          Открыть курс
+        </Link>
       );
     }
+    const busy = busyId === course.id;
     return (
       <button
         type="button"
         disabled={busy}
-        onClick={() => toggleEnroll(course)}
+        onClick={() => enrollCourse(course)}
         className="btn-primary w-full"
       >
         {busy ? "Записываем…" : "Записаться"}
@@ -140,8 +126,8 @@ export default function CoursesPage() {
   return (
     <div className="space-y-10">
       <header className="space-y-3">
-        <h1 className="text-[2.5rem] font-bold leading-tight text-ink">Курсы</h1>
-        <p className="text-[1.0625rem] text-muted">Выберите курс по теме и уровню.</p>
+        <h1 className="font-serif text-4xl text-ink sm:text-5xl">Курсы</h1>
+        <p className="text-lg text-muted">Выберите курс по теме и уровню.</p>
       </header>
 
       <section className="space-y-5" aria-label="Фильтры">
@@ -181,7 +167,7 @@ export default function CoursesPage() {
                   setCategory(c);
                   setPage(0);
                 }}
-                className={`${CHIP_BASE} ${active ? CHIP_ON : CHIP_OFF}`}
+                className={`${CHIP} ${active ? CHIP_ON : CHIP_OFF}`}
               >
                 {c || "Все"}
               </button>
@@ -189,11 +175,7 @@ export default function CoursesPage() {
           })}
         </div>
 
-        <div
-          role="group"
-          aria-label="Уровень"
-          className="inline-flex max-w-full flex-wrap gap-1 rounded-full bg-surface-2 p-1"
-        >
+        <div role="group" aria-label="Уровень" className="flex flex-wrap gap-2">
           {LEVEL_OPTIONS.map((l) => {
             const active = level === l;
             return (
@@ -205,9 +187,7 @@ export default function CoursesPage() {
                   setLevel(l);
                   setPage(0);
                 }}
-                className={`min-h-11 rounded-full px-4 text-[0.9375rem] font-semibold transition-colors duration-150 ${
-                  active ? "bg-surface text-ink shadow-card" : "text-muted hover:text-ink"
-                }`}
+                className={`${CHIP} ${active ? CHIP_ON : CHIP_OFF}`}
               >
                 {l === "" ? "Любой" : LEVEL_LABELS[l]}
               </button>
@@ -218,7 +198,7 @@ export default function CoursesPage() {
 
       {actionError && <ErrorBox message={actionError} />}
 
-      <p className="text-[0.9375rem] text-muted" aria-live="polite">
+      <p className="text-sm text-muted" aria-live="polite">
         {!loading && !error && result && (
           <>
             Найдено курсов: <span className="font-semibold text-ink tabular-nums">{result.total}</span>
@@ -240,7 +220,7 @@ export default function CoursesPage() {
       {!loading && error && <ErrorBox message={error} onRetry={() => setReloadKey((k) => k + 1)} />}
 
       {!loading && !error && result && result.items.length === 0 && (
-        <div className="rounded-xl border border-dashed border-line bg-surface px-6 py-12 text-center text-[0.9375rem] text-muted">
+        <div className="rounded-2xl border border-dashed border-line bg-surface px-6 py-12 text-center text-[0.9375rem] text-muted">
           Курсов не найдено. Измените запрос или фильтры.
         </div>
       )}

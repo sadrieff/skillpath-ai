@@ -3,22 +3,21 @@
 @tailwind utilities;
 
 /*
- * Дизайн-токены (docs/design/DESIGN.md, версия 2: светлая учебная тема).
- * Один источник: tailwind.config.js читает эти переменные.
- * Значения в виде RGB-каналов, чтобы работали модификаторы прозрачности (bg-accent/15).
+ * Дизайн-токены, версия 3 (docs/design/DESIGN.md). Ориентир: Brilliant.
+ * Один источник: tailwind.config.js читает эти переменные. RGB-каналы, чтобы работали bg-ink/10 и т.п.
  */
 :root {
   color-scheme: light;
-  --c-ground: 244 241 234;     /* #f4f1ea тёплая бумага */
+  --c-ground: 250 248 245;     /* #faf8f5 тёплый белый фон */
   --c-surface: 255 255 255;    /* #ffffff карточки */
-  --c-surface-2: 236 232 222;  /* #ece8de вложенные элементы, дорожки, чипы */
-  --c-line: 221 216 202;       /* #ddd8ca границы */
-  --c-ink: 26 26 46;           /* #1a1a2e основной текст */
-  --c-muted: 95 98 119;        /* #5f6277 второстепенный текст */
-  --c-accent: 214 58 18;       /* #d63a12 акцент, на нём белый текст (4.7:1) */
-  --c-accent-ink: 255 255 255; /* текст на акценте */
-  --c-danger: 198 40 40;       /* #c62828 */
-  --c-success: 30 122 70;      /* #1e7a46 */
+  --c-surface-2: 243 240 235;  /* #f3f0eb вложенное, дорожки, чипы */
+  --c-line: 232 228 221;       /* #e8e4dd тонкие линии */
+  --c-ink: 28 28 30;           /* #1c1c1e текст и главная кнопка */
+  --c-muted: 107 107 112;      /* #6b6b70 второстепенный текст */
+  --c-accent: 11 122 84;       /* #0b7a54 зелёный: прогресс, ссылки, успех (5:1 на фоне) */
+  --c-accent-ink: 255 255 255;
+  --c-danger: 192 45 45;       /* #c02d2d */
+  --c-success: 11 122 84;
 }
 
 body {
@@ -26,27 +25,31 @@ body {
   color: rgb(var(--c-ink));
 }
 
-/* Фокус для всех интерактивных элементов. Клик мышью по кнопке его не показывает. */
 :focus-visible {
-  outline: 3px solid rgb(var(--c-ink));
-  outline-offset: 2px;
+  outline: 2px solid rgb(var(--c-ink));
+  outline-offset: 3px;
 }
 
 body {
   font-family: var(--font-onest), system-ui, sans-serif;
-  font-size: 1.0625rem;
-  line-height: 1.55;
+  font-size: 1rem;
+  line-height: 1.6;
   overflow-wrap: break-word;
 }
 
+/* Заголовки страниц и разделов: антиква обычного веса, а не жирный гротеск. */
 h1,
-h2,
-h3 {
+h2 {
+  font-family: var(--font-serif), Georgia, serif;
+  font-weight: 500;
+  letter-spacing: -0.015em;
   text-wrap: balance;
-  letter-spacing: -0.02em;
 }
 
-/* Без задержки двойного тапа на элементах управления. */
+h3 {
+  text-wrap: balance;
+}
+
 a,
 button,
 input,
@@ -59,38 +62,48 @@ summary {
 }
 
 @layer components {
+  /* Главное действие: чёрная таблетка. На экране одна-две такие кнопки. */
   .btn-primary {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-[0.9375rem] font-bold text-accent-ink transition-[background-color,transform] duration-150 hover:bg-[#b8300c] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-ink px-6 py-2.5 text-[0.9375rem] font-semibold text-white transition-[background-color,transform] duration-150 hover:bg-ink/85 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40;
   }
+  /* Второстепенное: белая таблетка с тонкой рамкой. */
   .btn-secondary {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-line bg-surface px-5 py-2.5 text-[0.9375rem] font-semibold text-ink transition-[background-color,transform] duration-150 hover:bg-surface-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-line bg-surface px-6 py-2.5 text-[0.9375rem] font-semibold text-ink transition-[background-color,transform] duration-150 hover:bg-surface-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  /* Акцентная зелёная: только для «Продолжить» и «Отправить ответы». */
+  .btn-accent {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-accent px-6 py-2.5 text-[0.9375rem] font-semibold text-white transition-[background-color,transform] duration-150 hover:bg-accent/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40;
   }
   .card {
-    @apply rounded-xl border border-line bg-surface p-5 shadow-card;
+    @apply rounded-2xl border border-line bg-surface p-6;
   }
   .input {
-    @apply min-h-11 w-full rounded-lg border border-line bg-surface px-4 py-2.5 text-[0.9375rem] text-ink placeholder:text-muted disabled:opacity-60;
+    @apply min-h-11 w-full rounded-xl border border-line bg-surface px-4 py-2.5 text-[0.9375rem] text-ink placeholder:text-muted disabled:opacity-60;
   }
   .chip {
-    @apply inline-flex min-h-9 items-center rounded-full bg-surface-2 px-3.5 text-sm font-semibold text-ink;
+    @apply inline-flex min-h-9 items-center rounded-full border border-line bg-surface px-3.5 text-sm font-medium text-ink;
+  }
+  /* Мелкая надпись над заголовком блока, обычным регистром. */
+  .kicker {
+    @apply text-sm font-medium text-muted;
   }
 }
 
 /* Rendered markdown (lesson content). Used with react-markdown; no raw HTML is rendered. */
 .prose-sp {
-  @apply text-[1.0625rem] leading-[1.7] text-ink sm:text-[1.125rem];
+  @apply text-[1.0625rem] leading-[1.75] text-ink;
 }
 .prose-sp > * + * {
   margin-top: 1.25em;
 }
 .prose-sp h1 {
-  @apply mt-12 text-[1.75rem] font-extrabold leading-[1.2] text-ink;
+  @apply mt-12 font-serif text-[1.75rem] font-semibold leading-[1.2] text-ink;
 }
 .prose-sp h2 {
-  @apply mt-12 text-2xl font-bold leading-[1.25] text-ink sm:text-[1.75rem];
+  @apply mt-12 font-serif text-2xl font-semibold leading-[1.25] text-ink sm:text-[1.75rem];
 }
 .prose-sp h3 {
-  @apply mt-8 text-xl font-semibold leading-snug text-ink;
+  @apply mt-8 font-serif text-xl font-semibold leading-snug text-ink;
 }
 .prose-sp h4 {
   @apply mt-6 font-semibold text-ink;
@@ -108,13 +121,13 @@ summary {
   @apply list-decimal space-y-1.5 pl-6;
 }
 .prose-sp blockquote {
-  @apply border-l-2 border-accent pl-4 italic text-muted;
+  @apply border-l-2 border-line pl-4 italic text-muted;
 }
 .prose-sp code {
   @apply rounded bg-surface-2 px-1.5 py-0.5 font-mono text-[0.9em] text-ink;
 }
 .prose-sp pre {
-  @apply overflow-x-auto rounded-xl border border-line bg-surface-2 p-4 font-mono text-sm;
+  @apply overflow-x-auto rounded-xl bg-surface-2 p-4 font-mono text-sm;
 }
 .prose-sp pre code {
   @apply bg-transparent p-0;

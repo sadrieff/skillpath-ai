@@ -87,10 +87,13 @@ export default function AdminCourses() {
       {error && <ErrorBox message={error} onRetry={load} />}
 
       {stats && (
-        <div className="grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-5">
+        <div className="card grid grid-cols-2 overflow-hidden p-0 sm:grid-cols-5">
           {statItems.map((item) => (
-            <div key={item.label}>
-              <p className="text-[2rem] font-extrabold leading-none text-ink">{item.value}</p>
+            <div
+              key={item.label}
+              className="border-line p-5 [&:nth-child(even)]:border-l [&:nth-child(n+3)]:border-t sm:border-l sm:[&:nth-child(even)]:border-l-0 sm:[&:nth-child(n+3)]:border-t-0 sm:first:border-l-0"
+            >
+              <p className="font-serif text-3xl leading-none text-ink">{item.value}</p>
               <p className="mt-2 text-sm text-muted">{item.label}</p>
             </div>
           ))}
@@ -128,91 +131,93 @@ export default function AdminCourses() {
         )}
 
         {courses.length > 0 && (
-          <table className="w-full text-left">
-            <caption className="sr-only">Список курсов</caption>
-            <thead className="sr-only md:not-sr-only">
-              <tr className="border-b border-line text-sm text-muted">
-                <th scope="col" className="py-3 pr-4 font-semibold">
-                  Курс
-                </th>
-                <th scope="col" className="py-3 pr-4 font-semibold">
-                  Категория
-                </th>
-                <th scope="col" className="py-3 pr-4 font-semibold">
-                  Уровень
-                </th>
-                <th scope="col" className="py-3 pr-4 font-semibold">
-                  Часы
-                </th>
-                <th scope="col" className="py-3 font-semibold">
-                  <span className="sr-only">Действия</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="flex flex-col gap-3 md:table-row-group md:gap-0">
-              {courses.map((course) => {
-                const theme = courseTheme(course.category, course.id);
-                const deleting = deletingId === course.id;
-                return (
-                  <tr
-                    key={course.id}
-                    className="flex flex-col gap-3 rounded-xl border border-line bg-surface p-4 shadow-card md:table-row md:rounded-none md:border-0 md:bg-transparent md:p-0 md:shadow-none"
-                  >
-                    <th scope="row" className="text-left font-normal md:border-b md:border-line md:py-4 md:pr-4">
-                      <span className="flex items-start gap-3">
-                        <span
-                          aria-hidden="true"
-                          className="mt-1.5 h-3.5 w-3.5 shrink-0 rounded-full"
-                          style={{ background: theme.bg, boxShadow: `inset 0 0 0 2px ${theme.fg}` }}
-                        />
-                        <span className="min-w-0">
-                          <span className="block font-semibold leading-snug text-ink">{course.title}</span>
-                          {course.description && (
-                            <span className="mt-1 line-clamp-2 block text-sm text-muted">
-                              {course.description}
-                            </span>
-                          )}
+          <div className="card overflow-hidden p-0">
+            <table className="w-full text-left">
+              <caption className="sr-only">Список курсов</caption>
+              <thead className="sr-only md:not-sr-only">
+                <tr className="bg-surface-2/60 text-sm text-muted">
+                  <th scope="col" className="px-5 py-3 font-medium">
+                    Курс
+                  </th>
+                  <th scope="col" className="px-4 py-3 font-medium">
+                    Категория
+                  </th>
+                  <th scope="col" className="px-4 py-3 font-medium">
+                    Уровень
+                  </th>
+                  <th scope="col" className="px-4 py-3 font-medium">
+                    Часы
+                  </th>
+                  <th scope="col" className="px-5 py-3 font-medium">
+                    <span className="sr-only">Действия</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="flex flex-col divide-y divide-line md:table-row-group">
+                {courses.map((course) => {
+                  const theme = courseTheme(course.category, course.id);
+                  const deleting = deletingId === course.id;
+                  return (
+                    <tr
+                      key={course.id}
+                      className="flex flex-col gap-3 p-5 md:table-row md:p-0"
+                    >
+                      <th scope="row" className="text-left font-normal md:px-5 md:py-4">
+                        <span className="flex items-start gap-3">
+                          <span
+                            aria-hidden="true"
+                            className="mt-1.5 h-3.5 w-3.5 shrink-0 rounded-full border border-black/10"
+                            style={{ background: theme.bg }}
+                          />
+                          <span className="min-w-0">
+                            <span className="block font-medium leading-snug text-ink">{course.title}</span>
+                            {course.description && (
+                              <span className="mt-1 line-clamp-1 block text-sm text-muted">
+                                {course.description}
+                              </span>
+                            )}
+                          </span>
                         </span>
-                      </span>
-                    </th>
-                    <td className="text-sm text-ink md:border-b md:border-line md:py-4 md:pr-4">
-                      <span className="text-muted md:hidden">Категория: </span>
-                      {course.category}
-                    </td>
-                    <td className="text-sm text-ink md:border-b md:border-line md:py-4 md:pr-4">
-                      <span className="text-muted md:hidden">Уровень: </span>
-                      {LEVEL_LABELS[course.level] ?? course.level}
-                    </td>
-                    <td className="text-sm text-ink md:border-b md:border-line md:py-4 md:pr-4">
-                      <span className="text-muted md:hidden">Часы: </span>
-                      {course.duration_hours} ч
-                    </td>
-                    <td className="md:whitespace-nowrap md:border-b md:border-line md:py-4 md:text-right">
-                      <div className="flex flex-wrap gap-2 md:flex-nowrap md:justify-end">
-                        <button
-                          type="button"
-                          onClick={() => setEditor({ mode: "edit", course })}
-                          className="btn-secondary"
-                          aria-label={`Редактировать курс «${course.title}»`}
-                        >
-                          Редактировать
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => removeCourse(course)}
-                          disabled={deleting}
-                          className={dangerButton}
-                          aria-label={`Удалить курс «${course.title}»`}
-                        >
-                          {deleting ? "Удаляем…" : "Удалить"}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      </th>
+                      <td className="text-sm text-ink md:px-4 md:py-4">
+                        <span className="text-muted md:hidden">Категория: </span>
+                        {course.category}
+                      </td>
+                      <td className="text-sm text-ink md:px-4 md:py-4">
+                        <span className="text-muted md:hidden">Уровень: </span>
+                        {LEVEL_LABELS[course.level] ?? course.level}
+                      </td>
+                      <td className="text-sm text-ink md:px-4 md:py-4">
+                        <span className="text-muted md:hidden">Часы: </span>
+                        {course.duration_hours} ч
+                      </td>
+                      <td className="md:whitespace-nowrap md:px-5 md:py-4 md:text-right">
+                        <div className="flex flex-wrap gap-2 md:flex-nowrap md:justify-end">
+                          <button
+                            type="button"
+                            onClick={() => setEditor({ mode: "edit", course })}
+                            className="btn-secondary min-h-10 px-4"
+                            aria-label={`Редактировать курс «${course.title}»`}
+                          >
+                            Редактировать
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => removeCourse(course)}
+                            disabled={deleting}
+                            className={dangerButton}
+                            aria-label={`Удалить курс «${course.title}»`}
+                          >
+                            {deleting ? "Удаляем…" : "Удалить"}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
     </div>

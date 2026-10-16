@@ -9,7 +9,7 @@ interface StatCardProps {
 export default function StatCard({ label, value, hint }: StatCardProps) {
   return (
     <div>
-      <p className="text-[2.5rem] font-extrabold leading-none tabular-nums tracking-tight text-ink">{value}</p>
+      <p className="font-serif text-4xl leading-none tabular-nums text-ink">{value}</p>
       <p className="mt-2 text-sm text-muted">{label}</p>
       {hint && <p className="mt-1 text-sm text-muted">{hint}</p>}
     </div>

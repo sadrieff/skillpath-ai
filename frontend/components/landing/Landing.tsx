@@ -14,7 +14,7 @@ import {
 import { demoLogin, devLogin, errorMessage } from "@/lib/api";
 import { googleLoginUrl, useAuth } from "@/lib/auth";
 import CatalogTyping from "./CatalogTyping";
-import { CAPABILITIES, FAQ } from "./data";
+import { FAQ } from "./data";
 import MiniQuiz from "./MiniQuiz";
 import { useGoogleEnabled } from "./useGoogleEnabled";
 
@@ -159,6 +159,20 @@ function DemoLogin() {
   );
 }
 
+function Check() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M3 8.5l3 3 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+const PROGRESS_MOCK = [
+  { title: "Python для начинающих", pct: 75, color: "#f7efd2" },
+  { title: "Основы SQL", pct: 40, color: "#e1ecf7" },
+  { title: "Git и GitHub", pct: 10, color: "#f9e8dd" },
+];
+
 export default function Landing() {
   const { user } = useAuth();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -193,20 +207,20 @@ export default function Landing() {
   return (
     <div ref={rootRef} className="lp-root">
       <div className="lp-wrap">
-        <header className="lp-top">
-          <Link href="/" className="lp-wordmark-small">
-            SkillPath AI
+        <header className="lp-nav">
+          <Link href="/" className="lp-logo">
+            SkillPath
           </Link>
-          <nav className="lp-top-links" aria-label="Основная навигация">
+          <nav className="lp-nav-links" aria-label="Основная навигация">
             <Link href="/courses" className="lp-link">
               Курсы
             </Link>
             {logged ? (
-              <Link href="/dashboard" className="lp-link">
+              <Link href="/dashboard" className="lp-link lp-nav-cta">
                 Кабинет
               </Link>
             ) : (
-              <a href={googleEnabled ? googleLoginUrl() : "#lp-hero-title"} className="lp-link">
+              <a href={googleEnabled ? googleLoginUrl() : "#lp-hero-title"} className="lp-link lp-nav-cta">
                 Войти
               </a>
             )}
@@ -215,128 +229,156 @@ export default function Landing() {
 
         <section className="lp-hero" aria-labelledby="lp-hero-title">
           <div>
-            <h1 id="lp-hero-title" className="lp-statement" data-rise style={vi(0)}>
+            <h1 id="lp-hero-title" className="lp-h1" data-rise style={vi(0)}>
               Ошибка в тесте станет уроком
             </h1>
             <p className="lp-lead" data-rise style={vi(1)}>
-              SkillPath AI ведёт курс от урока к тесту. ИИ-наставник разбирает каждый неверный ответ
-              простыми словами.
+              Курсы по Python, SQL и Git с тестом после каждого урока. ИИ-наставник видит, какой ответ вы
+              выбрали, и объясняет, где ошибка.
             </p>
             <div className="lp-hero-actions" data-rise style={vi(2)}>
               {withDemo(<PrimaryAction logged={logged} />, logged)}
               {DEV_LOGIN_ENABLED && <DemoLogin />}
             </div>
           </div>
-          <div data-rise style={vi(3)}>
+          <div className="lp-panel lp-panel-peach" data-rise style={vi(3)}>
             <MiniQuiz />
           </div>
         </section>
 
-        <section className="lp-sec" aria-labelledby="lp-shots-title">
-          <h2 id="lp-shots-title" className="lp-h2" data-reveal>
-            Так это выглядит в приложении
-          </h2>
-          <p className="lp-sec-lead" data-reveal>
-            Скриншоты сделаны на демо-стенде. Урок, тест и наставник открываются на одной странице.
-          </p>
-          <div className="lp-shots">
-            <figure className="lp-shot" data-reveal>
-              <div className="lp-shot-frame">
-                <Image
-                  src="/landing/app-lesson.jpg"
-                  unoptimized
-                  alt="Страница урока: текст про SELECT слева и тест из трёх вопросов справа"
-                  width={1280}
-                  height={900}
-                  sizes="(max-width: 700px) 100vw, 840px"
-                />
-              </div>
-              <figcaption>Текст урока и тест рядом.</figcaption>
-            </figure>
-            <figure className="lp-shot" data-reveal style={vi(1)}>
-              <div className="lp-shot-frame">
-                <Image
-                  src="/landing/app-tutor.jpg"
-                  unoptimized
-                  alt="Панель ИИ-наставника с разбором ошибки в тесте по SQL"
-                  width={384}
-                  height={900}
-                  sizes="(max-width: 700px) 100vw, 260px"
-                />
-              </div>
-              <figcaption>Наставник объясняет ошибку и отвечает на вопросы по уроку.</figcaption>
-            </figure>
+        <section className="lp-facts" aria-label="Коротко о платформе">
+          <div className="lp-fact" data-reveal>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 5h11a3 3 0 013 3v11H7a3 3 0 01-3-3V5z" stroke="currentColor" strokeWidth="1.6" />
+              <path d="M8 9h6M8 13h6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            </svg>
+            <p className="lp-fact-main">12 уроков</p>
+            <p className="lp-fact-sub">в трёх курсах: Python, SQL, Git</p>
+          </div>
+          <div className="lp-fact" data-reveal style={vi(1)}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="1.6" />
+              <path d="M8.5 12.5l2.4 2.4 4.6-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            </svg>
+            <p className="lp-fact-main">Тест после урока</p>
+            <p className="lp-fact-sub">проходной балл 70%</p>
+          </div>
+          <div className="lp-fact" data-reveal style={vi(2)}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 6h14v9H9l-4 3V6z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+            </svg>
+            <p className="lp-fact-main">Разбор ошибок</p>
+            <p className="lp-fact-sub">от ИИ-наставника по теме урока</p>
           </div>
         </section>
 
-        <section className="lp-sec" aria-labelledby="lp-steps-title">
-          <h2 id="lp-steps-title" className="lp-h2" data-reveal>
-            Как наставник разбирает ошибку
+        <section className="lp-sec" aria-labelledby="lp-how-title">
+          <h2 id="lp-how-title" className="lp-h2 lp-center" data-reveal>
+            Как устроено обучение
           </h2>
-          <p className="lp-sec-lead" data-reveal>
-            Он видит, какой вариант вы выбрали и какой был верным, и объясняет разницу.
+          <p className="lp-sec-lead lp-center" data-reveal>
+            Урок, проверка и помощь наставника на одной странице, без переключения между вкладками.
           </p>
-          <div className="lp-grid-3">
-            <div className="lp-card lp-step lp-tone-sun" data-reveal>
-              <h3 className="lp-step-title">Вы отвечаете на вопрос</h3>
-              <p className="lp-call">Ваш ответ: int</p>
-              <p className="lp-response" data-ui>
-                Неверно. Правильный ответ: float.
+
+          <div className="lp-row" data-reveal>
+            <div className="lp-row-text">
+              <h3>Читаете урок и сразу проверяете себя</h3>
+              <p>
+                Текст урока слева, тест справа. После отправки видно, какие ответы верные, и почему.
+                Набрали 70% и больше, урок засчитан.
               </p>
             </div>
-            <div className="lp-card lp-step lp-tone-sky" data-reveal style={vi(1)}>
-              <h3 className="lp-step-title">Наставник объясняет</h3>
-              <p className="lp-call">Почему не int?</p>
-              <p className="lp-response" data-ui>
-                int хранит только целые числа. У 3.14 есть дробная часть, поэтому это float.
-              </p>
-            </div>
-            <div className="lp-card lp-step lp-tone-coral" data-reveal style={vi(2)}>
-              <h3 className="lp-step-title">Вы проходите тест заново</h3>
-              <p className="lp-call">Попытка 2: 2 из 2 верно</p>
-              <p className="lp-response" data-ui>
-                Результат 100%. Урок отмечен пройденным, прогресс курса обновлён.
-              </p>
+            <div className="lp-panel lp-panel-sky">
+              <Image
+                className="lp-shot"
+                src="/landing/app-lesson.jpg"
+                alt="Страница урока: текст про SELECT слева и тест из трёх вопросов справа"
+                width={1280}
+                height={900}
+                sizes="(max-width: 900px) 100vw, 600px"
+                unoptimized
+              />
             </div>
           </div>
-        </section>
 
-        <section className="lp-sec" aria-labelledby="lp-menu-title">
-          <h2 id="lp-menu-title" className="lp-h2" data-reveal>
-            Что внутри
-          </h2>
-          <p className="lp-sec-lead" data-reveal>
-            Всё, что нужно для прохождения курса, в одном приложении.
-          </p>
-          <div className="lp-grid-3">
-            {CAPABILITIES.map((c, i) => (
-              <div key={c.name} className="lp-card lp-feature" data-reveal style={vi(i % 3)}>
-                <p className="lp-feature-name">{c.name}</p>
-                <p className="lp-feature-value">{c.value}</p>
+          <div className="lp-row lp-row-flip" data-reveal>
+            <div className="lp-row-text">
+              <h3>Наставник разбирает именно вашу ошибку</h3>
+              <p>Он получает вопрос, ваш вариант и верный ответ, поэтому объясняет конкретную разницу.</p>
+              <ul className="lp-row-list">
+                <li>
+                  <Check />
+                  <span>Объяснит тему проще или приведёт пример</span>
+                </li>
+                <li>
+                  <Check />
+                  <span>Составит план повторения</span>
+                </li>
+                <li>
+                  <Check />
+                  <span>Отвечает только по материалу урока</span>
+                </li>
+              </ul>
+            </div>
+            <div className="lp-panel lp-panel-sage">
+              <Image
+                className="lp-shot lp-shot-narrow"
+                src="/landing/app-tutor.jpg"
+                alt="Панель ИИ-наставника с разбором ошибки в тесте по SQL"
+                width={384}
+                height={900}
+                sizes="300px"
+                unoptimized
+              />
+            </div>
+          </div>
+
+          <div className="lp-row" data-reveal>
+            <div className="lp-row-text">
+              <h3>Прогресс виден по каждому курсу</h3>
+              <p>
+                В кабинете курсы, на которых вы остановились, процент пройденного и результаты тестов. Одна
+                кнопка возвращает к следующему уроку.
+              </p>
+            </div>
+            <div className="lp-panel lp-panel-lavender" data-ui>
+              <div className="lp-mock">
+                {PROGRESS_MOCK.map((row) => (
+                  <div className="lp-mock-row" key={row.title}>
+                    <span className="lp-mock-dot" style={{ background: row.color }} />
+                    <div>
+                      <p className="lp-mock-title">{row.title}</p>
+                      <div className="lp-mock-bar">
+                        <span style={{ width: `${row.pct}%` }} />
+                      </div>
+                    </div>
+                    <span className="lp-mock-pct">{row.pct}%</span>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </section>
 
         <section className="lp-sec" aria-labelledby="lp-find-title">
-          <h2 id="lp-find-title" className="lp-h2" data-reveal>
+          <h2 id="lp-find-title" className="lp-h2 lp-center" data-reveal>
             Найдите курс по теме
           </h2>
-          <p className="lp-sec-lead" data-reveal>
-            Напишите тему, и каталог покажет, где её изучить.
+          <p className="lp-sec-lead lp-center" data-reveal>
+            Напишите, что хотите изучить, и каталог покажет подходящие уроки.
           </p>
-          <div className="lp-card" data-reveal>
+          <div className="lp-find" data-reveal>
             <CatalogTyping />
           </div>
         </section>
 
         <section className="lp-sec" aria-labelledby="lp-faq-title">
-          <h2 id="lp-faq-title" className="lp-h2" data-reveal>
+          <h2 id="lp-faq-title" className="lp-h2 lp-center" data-reveal>
             Вопросы и ответы
           </h2>
-          <div className="lp-grid-2" style={{ marginTop: 24 }}>
+          <div className="lp-faq">
             {FAQ.map((item, i) => (
-              <div key={item.q} className="lp-card" data-reveal style={vi(i % 2)}>
+              <div key={item.q} className="lp-faq-item" data-reveal style={vi(i % 2)}>
                 <h3 className="lp-faq-q">{item.q}</h3>
                 <p className="lp-faq-a">{item.a}</p>
               </div>
@@ -344,15 +386,13 @@ export default function Landing() {
           </div>
         </section>
 
-        <section className="lp-sec" aria-labelledby="lp-cta-title">
-          <div className="lp-cta" data-reveal>
-            <div>
-              <h2 id="lp-cta-title" className="lp-h2">
-                Откройте первый курс
-              </h2>
-              <p>Пройдите урок из курса «Python для начинающих» и сдайте первый тест.</p>
-            </div>
-            <div>{withDemo(<PrimaryAction logged={logged} />, logged)}</div>
+        <section className="lp-cta" aria-labelledby="lp-cta-title">
+          <div className="lp-panel lp-panel-butter" data-reveal>
+            <h2 id="lp-cta-title" className="lp-h2">
+              Начните с одного урока
+            </h2>
+            <p>Курс «Python для начинающих»: четыре урока, тест после каждого.</p>
+            <div className="lp-cta-actions">{withDemo(<PrimaryAction logged={logged} />, logged)}</div>
           </div>
         </section>
 

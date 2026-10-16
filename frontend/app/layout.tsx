@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth";
-import { onest } from "./fonts";
+import { onest, serif } from "./fonts";
 
 export const metadata: Metadata = {
   title: "SkillPath AI",
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="ru" className={onest.variable}>
+    <html lang="ru" className={`${onest.variable} ${serif.variable}`}>
       <body className="min-h-screen bg-ground font-sans text-ink antialiased">
         <AuthProvider>{children}</AuthProvider>
       </body>

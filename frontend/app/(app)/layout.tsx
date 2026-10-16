@@ -12,7 +12,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         Перейти к содержанию
       </a>
       {process.env.NEXT_PUBLIC_DEMO === "1" && (
-        <div className="bg-ink px-4 py-2 text-center text-sm text-white sm:px-6">
+        <div className="bg-surface-2 px-4 py-2 text-center text-sm text-muted sm:px-6">
           Демо-стенд. Данные можно менять, ночью они сбрасываются.
         </div>
       )}

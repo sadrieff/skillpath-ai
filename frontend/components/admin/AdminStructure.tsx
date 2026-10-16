@@ -171,7 +171,7 @@ export default function AdminStructure() {
             const editingThis = editor?.kind === "module" && editor.module?.id === module.id;
             const addingLesson = editor?.kind === "lesson" && editor.moduleId === module.id && !editor.lesson;
             return (
-              <div key={module.id} className="card overflow-hidden !p-0">
+              <div key={module.id} className="card overflow-hidden p-0">
                 <div className="space-y-4 border-b border-line px-5 py-4">
                   {editingThis ? (
                     <ModuleForm
@@ -186,7 +186,7 @@ export default function AdminStructure() {
                         <p className="text-sm text-muted">
                           Модуль {moduleIndex + 1} · порядок {module.position}
                         </p>
-                        <h3 className="text-lg font-bold text-ink">{module.title}</h3>
+                        <h3 className="text-lg font-semibold text-ink">{module.title}</h3>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <button

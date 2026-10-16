@@ -164,7 +164,7 @@ export default function LessonForm({
 
   return (
     <form onSubmit={handleSubmit} noValidate className="card space-y-6 sm:p-6" aria-label={editing ? "Редактирование урока" : "Новый урок"}>
-      <h4 className="text-lg font-bold text-ink">{editing ? "Редактирование урока" : "Новый урок"}</h4>
+      <h4 className="text-lg font-semibold text-ink">{editing ? "Редактирование урока" : "Новый урок"}</h4>
 
       {serverError && <ErrorBox message={serverError} />}
 
@@ -231,8 +231,8 @@ export default function LessonForm({
         )}
       </Field>
 
-      <div className="space-y-4 rounded-lg border border-line bg-surface-2 p-4">
-        <p className="text-sm font-semibold text-ink">Материал к уроку</p>
+      <div className="space-y-4 rounded-xl border border-line bg-surface-2/60 p-4">
+        <p className="text-sm font-medium text-ink">Материал к уроку</p>
         <Field label="Файл (PDF, PNG, JPG, TXT, MD, до 10 МБ)" error={uploadError ?? undefined}>
           {(control) => (
             <input
@@ -241,7 +241,7 @@ export default function LessonForm({
               accept={ACCEPTED_FILES}
               disabled={uploading}
               onChange={handleFile}
-              className="block w-full text-sm text-ink file:mr-4 file:cursor-pointer file:rounded file:border-0 file:bg-accent file:px-3 file:py-2 file:text-sm file:font-semibold file:text-accent-ink hover:file:bg-accent/90 disabled:opacity-60"
+              className="block w-full text-sm text-ink file:mr-4 file:cursor-pointer file:rounded-full file:border-0 file:bg-ink file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-ink/85 disabled:opacity-60"
             />
           )}
         </Field>

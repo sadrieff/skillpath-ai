@@ -168,7 +168,7 @@ export default function QuizForm({ lessonId, initial, onSaved }: QuizFormProps) 
     <form onSubmit={handleSubmit} noValidate className="space-y-6" aria-label="Редактор теста">
       {serverError && <ErrorBox message={serverError} />}
       {saved && !serverError && (
-        <p role="status" className="rounded-lg border border-success/40 bg-success/10 p-3 text-sm font-medium text-success">
+        <p role="status" className="rounded-xl border border-success/40 bg-success/10 p-3 text-sm font-medium text-success">
           Тест сохранён.
         </p>
       )}
@@ -195,7 +195,7 @@ export default function QuizForm({ lessonId, initial, onSaved }: QuizFormProps) 
           return (
             <li key={q.key} className="card space-y-5 sm:p-6">
               <div className="flex items-center justify-between gap-3">
-                <h4 className="text-lg font-bold text-ink">Вопрос {qIndex + 1}</h4>
+                <h4 className="text-lg font-semibold text-ink">Вопрос {qIndex + 1}</h4>
                 <button
                   type="button"
                   onClick={() => removeQuestion(q.key)}
@@ -220,7 +220,7 @@ export default function QuizForm({ lessonId, initial, onSaved }: QuizFormProps) 
               </Field>
 
               <fieldset className="space-y-2" aria-describedby={qErrors.options ? `opt-err-${q.key}` : undefined}>
-                <legend className="mb-2 text-sm font-semibold text-ink">
+                <legend className="mb-2 text-sm font-medium text-ink">
                   Варианты ответа (отметьте верный) *
                 </legend>
                 {q.options.map((option, oIndex) => {

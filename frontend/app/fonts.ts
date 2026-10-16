@@ -1,9 +1,17 @@
-import { Onest } from "next/font/google";
+import { Onest, Source_Serif_4 } from "next/font/google";
 
-// Onest covers Latin and Cyrillic. The direction sheet's Red Hat Display has no Cyrillic glyphs.
+// Текст и интерфейс: Onest, в нём есть кириллица.
 export const onest = Onest({
   subsets: ["latin", "cyrillic"],
-  weight: ["400", "500", "700", "800"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
   variable: "--font-onest",
+});
+
+// Заголовки: антиква с кириллицей, как у учебных платформ вроде Brilliant.
+export const serif = Source_Serif_4({
+  subsets: ["latin", "cyrillic"],
+  weight: ["500", "600"],
+  display: "swap",
+  variable: "--font-serif",
 });
