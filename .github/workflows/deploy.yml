@@ -3,8 +3,8 @@
 # Deploys the current main branch to a VPS over SSH:
 #   git pull && docker compose up -d --build
 #
-# Runs on manual trigger (workflow_dispatch) and automatically after a
-# successful push to main. Delete this file if you do not deploy from GitHub.
+# Runs only on manual trigger (workflow_dispatch): without the secrets below
+# an automatic run would fail on every push. Delete this file if you do not deploy from GitHub.
 #
 # Required repository secrets:
 #   VPS_HOST     - server address (IP or domain)
@@ -19,10 +19,6 @@ name: Deploy
 
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows: [CI]
-    types: [completed]
-    branches: [main]
 
 permissions:
   contents: read
