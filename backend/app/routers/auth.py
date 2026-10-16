@@ -115,6 +115,13 @@ def _require_demo_mode() -> None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
 
 
+@router.get("/providers")
+def providers() -> dict[str, bool]:
+    """Which sign-in methods the frontend may offer on this deployment."""
+    settings = get_settings()
+    return {"google": bool(settings.GOOGLE_CLIENT_ID), "demo": settings.DEMO_MODE}
+
+
 @router.get("/google/login")
 async def google_login(request: Request) -> RedirectResponse:
     settings = get_settings()

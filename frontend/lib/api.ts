@@ -172,6 +172,9 @@ export function googleLoginUrl(): string {
   return `${API_URL}/api/auth/google/login`;
 }
 
+export const getAuthProviders = () =>
+  request<{ google: boolean; demo: boolean }>("/api/auth/providers");
+
 export const getMe = () => request<User>("/api/auth/me");
 
 export const devLogin = (email: string, full_name?: string) =>

@@ -16,6 +16,7 @@ import { googleLoginUrl, useAuth } from "@/lib/auth";
 import CatalogTyping from "./CatalogTyping";
 import { CAPABILITIES, FAQ, PHOTO_CREDITS } from "./data";
 import MiniQuiz from "./MiniQuiz";
+import { useGoogleEnabled } from "./useGoogleEnabled";
 
 const DEV_LOGIN_ENABLED = process.env.NEXT_PUBLIC_ENABLE_DEV_LOGIN === "1";
 const DEMO_ENABLED = process.env.NEXT_PUBLIC_DEMO === "1";
@@ -26,6 +27,7 @@ function vi(i: number): CSSProperties {
 }
 
 function PrimaryAction({ logged }: { logged: boolean }) {
+  const googleEnabled = useGoogleEnabled();
   if (logged) {
     return (
       <Link href="/dashboard" className="lp-btn lp-btn-primary">
@@ -33,6 +35,7 @@ function PrimaryAction({ logged }: { logged: boolean }) {
       </Link>
     );
   }
+  if (!googleEnabled) return null;
   return (
     <a href={googleLoginUrl()} className="lp-btn lp-btn-primary">
       Войти через Google
@@ -49,6 +52,7 @@ function ActionGroup({ primary }: { primary: ReactNode }) {
   const router = useRouter();
   const [busy, setBusy] = useState<"student" | "admin" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const googleEnabled = useGoogleEnabled();
 
   async function onDemo(role: "student" | "admin") {
     setBusy(role);
@@ -69,7 +73,7 @@ function ActionGroup({ primary }: { primary: ReactNode }) {
         {primary}
         <button
           type="button"
-          className="lp-btn lp-btn-quiet"
+          className={googleEnabled ? "lp-btn lp-btn-quiet" : "lp-btn lp-btn-primary"}
           disabled={busy !== null}
           onClick={() => void onDemo("student")}
         >
@@ -159,6 +163,7 @@ export default function Landing() {
   const { user } = useAuth();
   const rootRef = useRef<HTMLDivElement>(null);
   const logged = Boolean(user);
+  const googleEnabled = useGoogleEnabled();
 
   // Hidden states only apply once JS has marked the page; without JS everything is visible.
   useEffect(() => {
@@ -201,7 +206,7 @@ export default function Landing() {
                 Кабинет
               </Link>
             ) : (
-              <a href={googleLoginUrl()} className="lp-link">
+              <a href={googleEnabled ? googleLoginUrl() : "#lp-hero-title"} className="lp-link">
                 Войти
               </a>
             )}

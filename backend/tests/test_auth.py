@@ -308,3 +308,14 @@ def test_upsert_google_profile_creates_new_profile(db: Session, settings, monkey
     )
     assert profile.id is not None
     assert profile.full_name == "Fresh"
+
+
+def test_providers_reflect_configuration(client, monkeypatch):
+    settings = get_settings()
+    monkeypatch.setattr(settings, "GOOGLE_CLIENT_ID", "")
+    monkeypatch.setattr(settings, "DEMO_MODE", True)
+    assert client.get("/api/auth/providers").json() == {"google": False, "demo": True}
+
+    monkeypatch.setattr(settings, "GOOGLE_CLIENT_ID", "id.apps.googleusercontent.com")
+    monkeypatch.setattr(settings, "DEMO_MODE", False)
+    assert client.get("/api/auth/providers").json() == {"google": True, "demo": False}
